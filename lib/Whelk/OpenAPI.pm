@@ -2,7 +2,8 @@ package Whelk::OpenAPI;
 
 use Kelp::Base;
 
-sub generate {
+sub generate
+{
 	my ($self, $data) = @_;
 
 	return {

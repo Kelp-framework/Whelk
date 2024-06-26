@@ -10,13 +10,15 @@ use JSON::PP;
 
 attr base_route => undef;
 
-sub resource_format {
+sub resource_format
+{
 	my $self = shift;
 
 	return $self->config('default_format');
 }
 
-sub _controller {
+sub _controller
+{
 	my $self = shift;
 	my $base = $self->routes->base;
 	my $class = ref $self;
@@ -25,7 +27,8 @@ sub _controller {
 	return $class;
 }
 
-sub execute_endpoint {
+sub execute_endpoint
+{
 	my ($self, $endpoint, @args) = @_;
 
 	my ($success, $data);
@@ -41,7 +44,8 @@ sub execute_endpoint {
 	return ($success, $data);
 }
 
-sub prepare_response {
+sub prepare_response
+{
 	my ($self, $success, $data) = @_;
 
 	# set code
@@ -70,7 +74,8 @@ sub prepare_response {
 	return ($success, $data);
 }
 
-sub wrap_endpoint {
+sub wrap_endpoint
+{
 	my ($self, $endpoint) = @_;
 
 	return sub {
@@ -83,19 +88,22 @@ sub wrap_endpoint {
 	};
 }
 
-sub wrap_response {
+sub wrap_response
+{
 	my ($self, $success, $data) = @_;
 
 	return {
 		success => $success ? JSON::PP::true : JSON::PP::false,
-		($success
+		(
+			$success
 			? (data => $data)
 			: (error => $data)
 		),
 	};
 }
 
-sub add_endpoint {
+sub add_endpoint
+{
 	my ($self, $name, $args) = @_;
 
 	$args = {
@@ -117,12 +125,12 @@ sub add_endpoint {
 	if (!ref $args->{to} && $args->{to} !~ m{^\+|#|::}) {
 		my $controller = $self->_controller;
 		my $join = $controller =~ m{#} ? '#' : '::';
-		$args->{to} =  $controller . $join . $args->{to};
+		$args->{to} = $controller . $join . $args->{to};
 	}
 	my $route = $self->add_route($name, $args)->parent;
 
 	my $destination = $route->dest;
-	$destination->[0] //= ref $self; # make sure plain subs work
+	$destination->[0] //= ref $self;    # make sure plain subs work
 	$destination->[1] = $self->wrap_endpoint($destination->[1]);
 
 	push @{$self->whelk->endpoints}, {

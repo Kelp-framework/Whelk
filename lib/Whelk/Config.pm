@@ -9,7 +9,7 @@ attr data => sub {
 		{
 			default_format => 'json',
 
-			modules      => [qw(Whelk JSON YAML)],
+			modules => [qw(Whelk JSON YAML)],
 			modules_init => {
 				Routes => {
 					base => 'Whelk::Resource',
@@ -18,7 +18,7 @@ attr data => sub {
 				},
 
 				JSON => {
-					utf8 => 0, # will not encode wide characters
+					utf8 => 0,    # will not encode wide characters
 				},
 
 				YAML => {
