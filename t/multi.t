@@ -7,28 +7,25 @@ use JSON::PP;
 
 use lib 't/lib';
 
-my $app = Whelk->new(mode => 'base');
+my $app = Whelk->new(mode => 'multi');
 my $t = Kelp::Test->new(app => $app);
 
 ################################################################################
-# This tests a very basic JSON resource created manually thorugh add_endpoint
-# calls
+# This checks whether two resources with different formats can coexist together
+# (yaml + json)
 ################################################################################
+
+# JSON
 
 $t->request(GET '/test')
 	->code_is(200)
 	->json_cmp({success => JSON::PP::true, data => 'hello, world!'});
 
-$t->request(GET '/test/t1')
+# YAML
+
+$t->request(GET '/deep')
 	->code_is(200)
-	->json_cmp({success => JSON::PP::true, data => {id => 1337, name => 'elite'}});
-
-$t->request(POST '/test/err')
-	->code_is(418)
-	->json_cmp({success => JSON::PP::false, error => 'no can do'});
-
-$t->request(GET '/test/err')
-	->code_is(404);
+	->yaml_cmp({success => JSON::PP::true, data => 'hello, world!'});
 
 done_testing;
 

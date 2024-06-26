@@ -1,7 +1,11 @@
+# base config for all tests
 {
-	api_resources => {
-		'Test' => '/test',
-		'Test::Deep' => '/deep',
+	'+modules' => [qw(Logger::Simple)],
+	modules_init => {
+		'Logger::Simple' => {
+			log_format => '# LOG: %s - %s - %s',
+			stdout => 1,
+		},
 	},
 }
 
