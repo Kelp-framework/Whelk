@@ -5,10 +5,9 @@ use Kelp::Exception;
 
 sub resource_format { 'yaml' }
 
-sub build
+sub api
 {
-	my ($self, @args) = @_;
-	$self->SUPER::build(@args);
+	my ($self) = @_;
 
 	$self->add_endpoint(
 		'/' => {

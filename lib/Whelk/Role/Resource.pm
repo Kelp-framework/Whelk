@@ -147,5 +147,11 @@ before 'build' => sub {
 	$self->base_route($base_route);
 };
 
+after 'build' => sub {
+	my ($self) = @_;
+
+	$self->api if $self->can('api');
+};
+
 1;
 

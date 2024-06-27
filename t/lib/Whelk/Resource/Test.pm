@@ -3,10 +3,9 @@ package Whelk::Resource::Test;
 use Kelp::Base 'Whelk::Resource';
 use Whelk::Exception;
 
-sub build
+sub api
 {
-	my ($self, @args) = @_;
-	$self->SUPER::build(@args);
+	my ($self) = @_;
 
 	$self->add_endpoint(
 		[GET => '/'] => {
