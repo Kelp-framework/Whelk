@@ -3,7 +3,7 @@ package Whelk::Resource::Test::Deep;
 use Kelp::Base 'Whelk::Resource';
 use Kelp::Exception;
 
-sub resource_format { 'yaml' }
+attr response_format => 'yaml';
 
 sub api
 {

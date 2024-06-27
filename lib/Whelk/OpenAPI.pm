@@ -2,9 +2,14 @@ package Whelk::OpenAPI;
 
 use Kelp::Base;
 
+sub parse
+{
+	my ($self, %data) = @_;
+}
+
 sub generate
 {
-	my ($self, $data) = @_;
+	my ($self) = @_;
 
 	return {
 		TODO => 1,

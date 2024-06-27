@@ -6,6 +6,7 @@ use Carp;
 
 attr openapi_generator => undef;
 attr endpoints => sub { [] };
+attr objects => sub { [] };
 
 sub build
 {
@@ -57,6 +58,11 @@ sub _install_openapi
 	my $class = $endpoint->{class} // 'Whelk::OpenAPI';
 	$self->openapi_generator(Kelp::Util::load_package($class)->new);
 
+	$self->openapi_generator->parse(
+		paths => $self->endpoints,
+		schemas => $self->objects,
+	);
+
 	$app->add_route(
 		[GET => $endpoint->{path}] => sub {
 			my ($app) = @_;
@@ -72,7 +78,7 @@ sub generate_openapi
 {
 	my ($self) = @_;
 
-	return $self->openapi_generator->generate($self->endpoints);
+	return $self->openapi_generator->generate;
 }
 
 1;
