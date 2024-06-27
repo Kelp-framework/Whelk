@@ -27,6 +27,9 @@ sub build
 		definition => Whelk::Schema::Definition->create($type, %args)
 	);
 
+	croak "trying to reuse schema name $name"
+		if $self->name && $registered{$self->name};
+
 	$registered{$self->name} = $self
 		if $self->name;
 
@@ -41,6 +44,13 @@ sub get_by_name
 		unless $registered{$name};
 
 	return $registered{$name}->definition;
+}
+
+sub all_schemas
+{
+	my ($class) = @_;
+
+	return [map { $registered{$_} } sort keys %registered];
 }
 
 1;

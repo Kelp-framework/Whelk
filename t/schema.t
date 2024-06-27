@@ -28,7 +28,6 @@ subtest 'should create a slightly complicated schema with references inside' => 
 	);
 
 	my $schema = Whelk::Schema->build(
-		name => 'some_schema',
 		type => 'object',
 		properties => {
 			int => \'to_reference',

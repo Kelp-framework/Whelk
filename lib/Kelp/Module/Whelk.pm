@@ -3,10 +3,10 @@ package Kelp::Module::Whelk;
 use Kelp::Base 'Kelp::Module';
 use Kelp::Util;
 use Carp;
+use Whelk::Schema;
 
 attr openapi_generator => undef;
 attr endpoints => sub { [] };
-attr objects => sub { [] };
 
 sub build
 {
@@ -60,7 +60,7 @@ sub _install_openapi
 
 	$self->openapi_generator->parse(
 		paths => $self->endpoints,
-		schemas => $self->objects,
+		schemas => Whelk::Schema->all_schemas,
 	);
 
 	$app->add_route(
