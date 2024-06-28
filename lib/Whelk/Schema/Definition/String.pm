@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::String;
 
-use Kelp::Base 'Whelk::Schema::Definition::Scalar';
+use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
 
 sub inhale
 {

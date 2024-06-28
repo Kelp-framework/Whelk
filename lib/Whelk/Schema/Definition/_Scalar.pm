@@ -1,4 +1,4 @@
-package Whelk::Schema::Definition::Scalar;
+package Whelk::Schema::Definition::_Scalar;
 
 use Kelp::Base 'Whelk::Schema::Definition';
 

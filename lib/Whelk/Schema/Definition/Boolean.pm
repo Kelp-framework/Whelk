@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Boolean;
 
-use Kelp::Base 'Whelk::Schema::Definition::Scalar';
+use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
 
 sub inhale
