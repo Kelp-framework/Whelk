@@ -29,6 +29,30 @@ sub new
 
 sub _resolve { }
 
+sub _build_nested
+{
+	my ($self, $item) = @_;
+
+	if (ref $item eq 'SCALAR') {
+		$item = Whelk::Schema->get_by_name($$item);
+	}
+	elsif (ref $item eq 'ARRAY') {
+		my ($type, @rest) = @$item;
+		$item = $self->_build_nested($type)->clone(@rest);
+	}
+	else {
+		$item = Whelk::Schema->build(%$item);
+	}
+}
+
+sub clone
+{
+	my $self = shift;
+	my $class = ref $self;
+
+	return bless {%$self, @_}, $class;
+}
+
 sub exhale
 {
 	...;

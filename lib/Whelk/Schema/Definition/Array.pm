@@ -6,15 +6,7 @@ sub _resolve
 {
 	my ($self) = @_;
 
-	my $item = $self->properties;
-	if (ref $item eq 'SCALAR') {
-		$item = Whelk::Schema->get_by_name($$item);
-	}
-	else {
-		$item = Whelk::Schema->build(%$item);
-	}
-
-	$self->properties($item);
+	$self->properties($self->_build_nested($self->properties));
 }
 
 sub inhale

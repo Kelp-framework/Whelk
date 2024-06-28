@@ -8,6 +8,10 @@ use Try::Tiny;
 use Scalar::Util qw(blessed);
 use JSON::PP;
 
+use Whelk::Schema;
+use Whelk::Endpoint;
+use Kelp::Exception;
+
 attr base_route => undef;
 attr response_format => sub { shift->config('default_format') };
 attr request_format => undef;
@@ -24,37 +28,13 @@ sub _controller
 	return $class;
 }
 
-sub _fill_path_parameters
-{
-	my ($self, $pattern, $parameters) = @_;
-
-	croak 'only :normal placeholders are allowed in Whelk'
-		if $pattern =~ m/[*>?]/;
-
-	# Make path. First replace curlies with \0, same as in Kelp. Then adjust
-	# parameters to OpenAPI format. Last remove \0
-	my $path = $pattern;
-	$path =~ s/[{}]/\0/g;
-
-	while ($path =~ s/:(\w+)/{$1}/) {
-		my $token = $1;
-
-		# add path parameter
-		$parameters->{path}{$token}{required} = 1;
-	}
-
-	$path =~ s/\0//g;
-
-	return $path;
-}
-
 sub execute_endpoint
 {
 	my ($self, $endpoint, @args) = @_;
 
 	my ($success, $data);
 	try {
-		$data = $endpoint->($self, @args);
+		$data = $endpoint->code->($self, @args);
 		$success = 1;
 	}
 	catch {
@@ -67,32 +47,44 @@ sub execute_endpoint
 
 sub prepare_response
 {
-	my ($self, $success, $data) = @_;
+	my ($self, $endpoint, $success, $data) = @_;
+	my $code;
 
 	# set code
 	if ($success) {
-		$self->res->set_code(200);
+		$code = 200;
 	}
 	elsif (blessed $data && $data->isa('Whelk::Exception')) {
-		$self->res->set_code($data->code);
+		$code = $data->code;
 		$data = '' . $data->body;    # only strings in errors - try to stringify
 	}
 	elsif (blessed $data && $data->isa('Kelp::Exception')) {
 		$data->throw;
 	}
 	else {
-		$self->res->set_code(500);
+		$code = 500;
 		$self->logger(error => $data)
 			if $self->can('logger');
 		$data = 'Internal error';
 	}
 
-	# set content type
+	my $response = $self->wrap_response($success, $data);
+	my $inhaled = $endpoint->response_schema->inhale($response);
+	if (defined $inhaled) {
+		my $path = $endpoint->path;
+		Kelp::Exception->throw(
+			500,
+			data => "response schema validation failed for $path: $inhaled",
+		);
+	}
+
+	# set code and content type
+	$self->res->set_code($code);
 	my $format = $self->response_format;
 	$self->res->$format
 		unless $self->res->content_type;
 
-	return ($success, $data);
+	return $response;
 }
 
 sub wrap_endpoint
@@ -101,11 +93,12 @@ sub wrap_endpoint
 
 	return sub {
 		my $self = shift;
-		my ($success, $data) = $self->prepare_response(
-			$self->execute_endpoint($endpoint, @_)
+		my $response = $self->prepare_response(
+			$endpoint,
+			$self->execute_endpoint($endpoint, @_),
 		);
 
-		return $self->wrap_response($success, $data);
+		return $endpoint->response_schema->exhale($response);
 	};
 }
 
@@ -114,7 +107,7 @@ sub wrap_response
 	my ($self, $success, $data) = @_;
 
 	return {
-		success => $success ? JSON::PP::true : JSON::PP::false,
+		success => $success,
 		(
 			$success
 			? (data => $data)
@@ -123,18 +116,42 @@ sub wrap_response
 	};
 }
 
+sub response_schema
+{
+	my ($self, $data_schema) = @_;
+
+	return Whelk::Schema->build(
+		type => 'object',
+		properties => {
+			success => {
+				type => 'boolean',
+			},
+			data => [$data_schema, required => !!0],
+			error => {
+				type => 'string',
+				required => !!0,
+			},
+		},
+	);
+}
+
 sub add_endpoint
 {
-	my ($self, $pattern, $args) = @_;
+	my ($self, $pattern, $args, %meta) = @_;
+
+	if (!$meta{response}) {
+		carp 'no response schema, setting flat null'
+			if $self->whelk->verbose;
+
+		$meta{response} = {
+			type => 'null',
+		};
+	}
 
 	# make sure we have hash (same as in Kelp)
 	$args = {
 		to => $args,
 	} unless ref $args eq 'HASH';
-
-	# extra Whelk data to get from the definition
-	my $metadata = delete $args->{meta} // {};
-	my $parameters = delete $args->{parameters} // {};
 
 	# handle [METHOD => $pattern]
 	if (ref $pattern eq 'ARRAY') {
@@ -151,8 +168,6 @@ sub add_endpoint
 	$pattern =~ s{/$}{};
 	$pattern =~ s{/+}{/};
 
-	my $path = $self->_fill_path_parameters($pattern, $parameters);
-
 	if (!ref $args->{to} && $args->{to} !~ m{^\+|#|::}) {
 		my $controller = $self->_controller;
 		my $join = $controller =~ m{#} ? '#' : '::';
@@ -160,21 +175,21 @@ sub add_endpoint
 	}
 	my $route = $self->add_route($pattern, $args)->parent;
 
-	my $destination = $route->dest;
-	$destination->[0] //= ref $self;    # make sure plain subs work
-	$destination->[1] = $self->wrap_endpoint($destination->[1]);
+	my $endpoint = Whelk::Endpoint->new(
+		route => $route,
+		code => $route->dest->[1],
+		request_format => $self->request_format,
+		request_schema => $meta{request},
+		response_format => $self->response_format,
+		response_schema => $self->response_schema($meta{response}),
+		parameters => $meta{parameters},
+	);
 
-	push @{$self->whelk->endpoints}, {
-		id => $route->has_name ? $route->name : undef,
-		path => $path,
-		method => $route->method,
-		format => {
-			request => $self->request_format,
-			response => $self->response_format,
-		},
-		parameters => $parameters,
-		%{$metadata},
-	};
+	$route->dest->[0] //= ref $self;    # make sure plain subs work
+	$route->dest->[1] = $self->wrap_endpoint($endpoint);
+
+	push @{$self->whelk->endpoints}, $endpoint;
+	return $self;
 }
 
 sub api { }

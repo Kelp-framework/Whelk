@@ -10,19 +10,35 @@ sub api
 	$self->add_endpoint(
 		[GET => '/'] => {
 			to => 'home',
-		}
+		},
+
+		response => {
+			type => 'string',
+		},
 	);
 
 	$self->add_endpoint(
 		'/t1' => {
 			to => 'Test::test_action',
-		}
+		},
+
+		response => {
+			type => 'object',
+			properties => {
+				id => {
+					type => 'integer',
+				},
+				name => {
+					type => 'string',
+				},
+			},
+		},
 	);
 
 	$self->add_endpoint(
 		[POST => '/err'] => {
 			to => 'test#error_action',
-		}
+		},
 	);
 }
 

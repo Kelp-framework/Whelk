@@ -12,7 +12,11 @@ sub api
 	$self->add_endpoint(
 		'/' => {
 			to => 'home',
-		}
+		},
+
+		response => {
+			type => 'string',
+		},
 	);
 
 	$self->add_endpoint(

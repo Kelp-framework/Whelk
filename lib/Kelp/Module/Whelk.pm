@@ -5,6 +5,7 @@ use Kelp::Util;
 use Carp;
 use Whelk::Schema;
 
+attr verbose => !!1;
 attr openapi_generator => undef;
 attr endpoints => sub { [] };
 
@@ -12,6 +13,9 @@ sub build
 {
 	my ($self, %args) = @_;
 	my $app = $self->app;
+
+	$self->verbose($args{verbose})
+		if exists $args{verbose};
 
 	# if this is Whelk or based on Whelk, use the main config
 	if ($app->isa('Whelk')) {

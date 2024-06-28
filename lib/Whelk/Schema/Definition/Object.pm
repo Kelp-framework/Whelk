@@ -8,12 +8,7 @@ sub _resolve
 
 	my $properties = $self->properties;
 	foreach my $key (keys %{$properties}) {
-		if (ref $properties->{$key} eq 'SCALAR') {
-			$properties->{$key} = Whelk::Schema->get_by_name(${$properties->{$key}});
-		}
-		else {
-			$properties->{$key} = Whelk::Schema->build(%{$properties->{$key}});
-		}
+		$properties->{$key} = $self->_build_nested($properties->{$key});
 	}
 }
 
