@@ -74,7 +74,7 @@ sub prepare_response
 		my $path = $endpoint->path;
 		Kelp::Exception->throw(
 			500,
-			data => "response schema validation failed for $path: $inhaled",
+			body => "response schema validation failed for $path: $inhaled",
 		);
 	}
 
@@ -197,7 +197,7 @@ sub api { }
 before 'build' => sub {
 	my ($self, $base_route) = @_;
 	croak 'Wrong base route for ' . $self->_controller
-		unless !ref $base_route && $base_route =~ m{^/.};
+		unless !ref $base_route && $base_route =~ m{^/};
 
 	$self->base_route($base_route);
 };
