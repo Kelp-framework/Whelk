@@ -3,6 +3,7 @@ package Whelk::Schema::Definition;
 use Kelp::Base;
 use Carp;
 use Kelp::Util;
+use Scalar::Util qw(blessed);
 
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
@@ -33,15 +34,18 @@ sub _build_nested
 {
 	my ($self, $item) = @_;
 
+	if (blessed $item && $item->isa(__PACKAGE__)) {
+		return $item;
+	}
 	if (ref $item eq 'SCALAR') {
-		$item = Whelk::Schema->get_by_name($$item);
+		return Whelk::Schema->get_by_name($$item);
 	}
 	elsif (ref $item eq 'ARRAY') {
 		my ($type, @rest) = @$item;
-		$item = $self->_build_nested($type)->clone(@rest);
+		return $self->_build_nested($type)->clone(@rest);
 	}
 	else {
-		$item = Whelk::Schema->build(%$item);
+		return Whelk::Schema->build(%$item);
 	}
 }
 

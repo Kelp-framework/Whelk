@@ -35,8 +35,12 @@ sub _load_config
 
 	# if this is Whelk or based on Whelk, use the main config
 	if ($app->isa('Whelk')) {
-		$args->{$_} //= $app->config($_)
-			for qw(api_resources openapi_endpoint);
+		$args->{$_} //= $app->config("api_$_")
+			for qw(
+			resources
+			openapi
+			default_wrapper
+			);
 	}
 }
 
@@ -45,16 +49,34 @@ sub _initialize_resources
 	my ($self, %args) = @_;
 	my $app = $self->app;
 
-	my %resources = %{$args{api_resources} // {}};
-	carp 'No api_resources for Whelk, you should define some in config'
+	$args{default_wrapper} //= 'Simple';
+	my %resources = %{$args{resources} // {}};
+	carp 'No resources for Whelk, you should define some in config'
 		unless keys %resources;
 
 	foreach my $resource (keys %resources) {
 		my $controller = $app->context->controller($resource);
+		my $config = $resources{$resource};
+
+		$config = {
+			path => $config
+		} unless ref $config eq 'HASH';
+
 		croak "$resource does not extend " . $app->routes->base
 			unless $controller->isa($app->routes->base);
 
-		$controller->build($resources{$resource});
+		croak "$resource does not implement Whelk::Role::Resource"
+			unless $controller->DOES('Whelk::Role::Resource');
+
+		croak "Wrong path for $resource"
+			unless $config->{path} =~ m{^/};
+
+		my $wrapper_class = $config->{wrapper} // $args{default_wrapper};
+		$wrapper_class = Kelp::Util::camelize($wrapper_class, 'Whelk::Wrapper', 1);
+		$controller->wrapper(Kelp::Util::load_package($wrapper_class)->new(resource => $controller));
+
+		$controller->base_route($config->{path});
+		$controller->build;
 	}
 }
 
@@ -63,10 +85,10 @@ sub _install_openapi
 	my ($self, %args) = @_;
 	my $app = $self->app;
 
-	my $endpoint = $args{openapi_endpoint};
+	my $endpoint = $args{openapi};
 	return unless $endpoint;
 
-	croak 'openapi_endpoint requires path and format'
+	croak 'openapi_path requires path and format'
 		unless $endpoint->{path} && $endpoint->{format};
 
 	my $class = $endpoint->{class} // 'Whelk::OpenAPI';

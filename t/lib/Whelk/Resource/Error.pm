@@ -25,7 +25,9 @@ sub api
 		[GET => '/wrong_type'] => sub {
 			return [11];
 		},
-		response => \'test_response',
+		response => {
+			name => \'test_response',
+		},
 	);
 
 	$self->add_endpoint(
@@ -34,7 +36,9 @@ sub api
 				opt_num => 5,
 			};
 		},
-		response => \'test_response',
+		response => {
+			name => \'test_response',
+		},
 	);
 
 	$self->add_endpoint(
@@ -44,7 +48,9 @@ sub api
 				opt_num => 'this got mixed up',
 			};
 		},
-		response => \'test_response',
+		response => {
+			name => \'test_response',
+		},
 	);
 }
 

@@ -1,6 +1,7 @@
 package Whelk::Endpoint;
 
 use Kelp::Base;
+use Whelk::Schema;
 
 attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
 attr -route => sub { die 'route is required in endpoint' };
@@ -11,6 +12,9 @@ attr -request_schema => undef;
 attr -response_format => sub { die 'response_format is required in endpoint' };
 attr -response_schema => sub { die 'response_schema is required in endpoint' };
 attr -parameters => sub { {} };
+
+# to be built in wrapers
+attr full_response_schema => undef;
 
 sub new
 {

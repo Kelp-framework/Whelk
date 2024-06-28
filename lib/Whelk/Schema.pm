@@ -11,7 +11,9 @@ my %registered;
 
 sub build
 {
-	my ($class, %args) = @_;
+	my ($class, @args) = @_;
+	return undef if @args == 1 && !defined $args[0];
+	my %args = @args == 1 && ref $args[0] eq 'HASH' ? %{$args[0]} : @args;
 
 	my $name = delete $args{name};
 	if (ref $name eq 'SCALAR') {
