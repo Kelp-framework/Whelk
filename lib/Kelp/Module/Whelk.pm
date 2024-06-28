@@ -6,28 +6,38 @@ use Carp;
 use Whelk::Schema;
 
 attr verbose => !!1;
+attr inhale_response => !!1;
 attr openapi_generator => undef;
 attr endpoints => sub { [] };
 
 sub build
 {
 	my ($self, %args) = @_;
-	my $app = $self->app;
-
-	$self->verbose($args{verbose})
-		if exists $args{verbose};
-
-	# if this is Whelk or based on Whelk, use the main config
-	if ($app->isa('Whelk')) {
-		$args{$_} //= $app->config($_)
-			for qw(api_resources openapi_endpoint);
-	}
+	$self->_load_config(\%args);
 
 	# register before initializing, so that controllers have acces to whelk
 	$self->register(whelk => $self);
 
 	$self->_initialize_resources(%args);
 	$self->_install_openapi(%args);
+}
+
+sub _load_config
+{
+	my ($self, $args) = @_;
+	my $app = $self->app;
+
+	$self->verbose($args->{verbose})
+		if exists $args->{verbose};
+
+	$self->inhale_response($args->{inhale_response})
+		if exists $args->{inhale_response};
+
+	# if this is Whelk or based on Whelk, use the main config
+	if ($app->isa('Whelk')) {
+		$args->{$_} //= $app->config($_)
+			for qw(api_resources openapi_endpoint);
+	}
 }
 
 sub _initialize_resources

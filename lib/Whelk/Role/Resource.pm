@@ -69,13 +69,15 @@ sub prepare_response
 	}
 
 	my $response = $self->wrap_response($success, $data);
-	my $inhaled = $endpoint->response_schema->inhale($response);
-	if (defined $inhaled) {
-		my $path = $endpoint->path;
-		Kelp::Exception->throw(
-			500,
-			body => "response schema validation failed for $path: $inhaled",
-		);
+	if ($self->whelk->inhale_response) {
+		my $inhaled = $endpoint->response_schema->inhale($response);
+		if (defined $inhaled) {
+			my $path = $endpoint->path;
+			Kelp::Exception->throw(
+				500,
+				body => "response schema validation failed for $path: $inhaled",
+			);
+		}
 	}
 
 	# set code and content type
