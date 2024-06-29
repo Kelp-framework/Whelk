@@ -14,7 +14,7 @@ attr -response_schema => sub { die 'response_schema is required in endpoint' };
 attr -parameters => sub { {} };
 
 # to be built in wrapers
-attr full_response_schema => undef;
+attr -response_schemas => sub { {} };
 
 sub new
 {

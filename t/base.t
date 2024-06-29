@@ -25,10 +25,14 @@ $t->request(GET '/test/t1')
 
 $t->request(POST '/test/err')
 	->code_is(418)
-	->json_cmp({success => JSON::PP::false, error => 'no can do'});
+	->json_cmp({success => JSON::PP::false, error => "I'm a teapot"});
 
 $t->request(GET '/test/err')
 	->code_is(404);
+
+$t->request(POST '/test/custom_err')
+	->code_is(400)
+	->json_cmp({success => JSON::PP::false, error => "Something went very wrong"});
 
 done_testing;
 

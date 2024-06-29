@@ -1,20 +1,38 @@
 package Whelk::Wrapper::Simple;
 
 use Kelp::Base 'Whelk::Wrapper';
+use Kelp::Exception;
 
-sub wrap
+sub wrap_error
 {
-	my ($self, $endpoint) = @_;
-	$endpoint->full_response_schema($endpoint->response_schema);
+	my ($self, $data) = @_;
 
-	return $self->SUPER::wrap($endpoint);
+	return {error => $data};
 }
 
 sub wrap_data
 {
-	my ($self, $success, $data) = @_;
+	my ($self, $data) = @_;
 
 	return $data;
+}
+
+sub build_response_schemas
+{
+	my ($self, $endpoint) = @_;
+	my $schema = $endpoint->response_schema;
+	my $schemas = $endpoint->response_schemas;
+
+	$schemas->{200} = $schema;
+
+	$schemas->{500} = $schemas->{400} = Whelk::Schema->build(
+		type => 'object',
+		properties => {
+			error => {
+				type => 'string',
+			},
+		},
+	);
 }
 
 1;

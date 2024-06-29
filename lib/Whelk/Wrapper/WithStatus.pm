@@ -4,48 +4,53 @@ use Kelp::Base 'Whelk::Wrapper';
 
 use Whelk::Schema;
 
-sub wrap
+sub wrap_error
 {
-	my ($self, $endpoint) = @_;
-	$self->build_response_schema($endpoint);
+	my ($self, $data) = @_;
 
-	return $self->SUPER::wrap($endpoint);
+	return {
+		success => 0,
+		error => $data,
+	};
 }
 
 sub wrap_data
 {
-	my ($self, $success, $data) = @_;
+	my ($self, $data) = @_;
 
 	return {
-		success => !!$success,
-		(
-			$success
-			? (data => $data)
-			: (error => $data)
-		),
+		success => 1,
+		data => $data,
 	};
 }
 
-sub build_response_schema
+sub build_response_schemas
 {
 	my ($self, $endpoint) = @_;
 	my $schema = $endpoint->response_schema;
+	my $schemas = $endpoint->response_schemas;
 
-	my $full = Whelk::Schema->build(
+	$schemas->{200} = Whelk::Schema->build(
 		type => 'object',
 		properties => {
 			success => {
 				type => 'boolean',
 			},
-			data => [$schema, required => !!0],
-			error => {
-				type => 'string',
-				required => !!0,
-			},
+			data => [$schema, required => !!1],
 		},
 	);
 
-	$endpoint->full_response_schema($full);
+	$schemas->{500} = $schemas->{400} = Whelk::Schema->build(
+		type => 'object',
+		properties => {
+			success => {
+				type => 'boolean',
+			},
+			error => {
+				type => 'string',
+			},
+		},
+	);
 }
 
 1;

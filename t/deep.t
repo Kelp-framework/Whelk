@@ -26,7 +26,7 @@ $t->request(GET '/deep/err1')
 
 $t->request(GET '/deep/err2')
 	->code_is(500)
-	->yaml_cmp({success => JSON::PP::false, error => 'Internal error'});
+	->yaml_cmp({success => JSON::PP::false, error => 'Internal Server Error'});
 
 done_testing;
 

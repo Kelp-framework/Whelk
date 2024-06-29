@@ -40,6 +40,15 @@ sub api
 			to => 'test#error_action',
 		},
 	);
+
+	$self->add_endpoint(
+		[POST => '/custom_err'] => sub {
+			my ($self) = @_;
+
+			$self->res->code(400);
+			return 'Something went very wrong';
+		},
+	);
 }
 
 sub home
