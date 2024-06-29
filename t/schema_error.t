@@ -17,15 +17,23 @@ my $t = Kelp::Test->new(app => $app);
 
 $t->request(GET '/wrong_type')
 	->code_is(500)
-	->content_type_is('text/plain');
+	->json_cmp({error => 'Internal Server Error'});
 
 $t->request(GET '/no_string')
 	->code_is(500)
-	->content_type_is('text/plain');
+	->json_cmp({error => 'Internal Server Error'});
 
 $t->request(GET '/not_a_number')
 	->code_is(500)
-	->content_type_is('text/plain');
+	->json_cmp({error => 'Internal Server Error'});
+
+$t->request(GET '/error_object')
+	->code_is(403)
+	->json_cmp({error => 'Forbidden'});
+
+$t->request(GET '/invalid_planned_error')
+	->code_is(500)
+	->json_cmp({error => 'Internal Server Error'});
 
 done_testing;
 

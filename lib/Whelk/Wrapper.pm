@@ -32,9 +32,7 @@ sub prepare_response
 
 	# decide on the resulting code and data based on status
 	if ($success) {
-		my $code = $res->code || 200;
-		$res->set_code($code);
-		$success = int($code / 100) == 2;
+		$res->set_code(200) unless $res->code;
 	}
 	else {
 		if (blessed $data && $data->isa('Kelp::Exception')) {
@@ -59,6 +57,7 @@ sub prepare_response
 		unless $res->content_type;
 
 	# TODO: 204 no content
+	$success = int($res->code / 100) == 2;
 	my $response = $success ? $self->wrap_data($data) : $self->wrap_error($data);
 	return $self->inhale_exhale($app, $endpoint, $response);
 }
@@ -68,14 +67,16 @@ sub inhale_exhale
 	my ($self, $app, $endpoint, $response, $inhale_error) = @_;
 	my $schema = $self->map_code_to_schema($endpoint, $app->res->code);
 
-	# try to inhale
+	# try inhaling
 	if ($app->whelk->inhale_response) {
 		my $inhaled = $schema->inhale($response);
 		if (defined $inhaled) {
 			my $path = $endpoint->path;
 
-			# if this is an error with inhaling itself, we have to resort to
-			# throwing an exception to avoid an infinite recursion
+			# If this is an error with inhaling itself, we have to resort to
+			# throwing an exception to avoid an infinite recursion. This may
+			# happen if the wrapper code has a bug in wrap_error and
+			# build_response_schemas.
 			Kelp::Exception->throw(
 				500,
 				body => "could not inhale error response for $path: $inhaled"
@@ -83,7 +84,7 @@ sub inhale_exhale
 
 			# otherwise, we can inhale_exhale again, this time with an error
 			$app->res->set_code(500);
-			my $error = $self->on_error("response schema validation failed for $path: $inhaled");
+			my $error = $self->on_error($app, "response schema validation failed for $path: $inhaled");
 
 			return $self->inhale_exhale($app, $endpoint, $self->wrap_error($error), 1);
 		}
