@@ -6,6 +6,7 @@ use Try::Tiny;
 use Scalar::Util qw(blessed);
 use HTTP::Status qw(status_message);
 use Kelp::Exception;
+use Whelk::Schema;
 use Whelk::Exception;
 
 sub inhale_request
@@ -99,21 +100,47 @@ sub prepare_response
 	$res->$format
 		unless $res->content_type;
 
-	$success = int($res->code / 100) == 2;
-	my $response = $success ? $self->wrap_data($data) : $self->wrap_error($data);
-	return $self->inhale_exhale($app, $endpoint, $response);
+	return $self->inhale_exhale($app, $endpoint, $data);
 }
 
 sub inhale_exhale
 {
 	my ($self, $app, $endpoint, $response, $inhale_error) = @_;
-	my $schema = $self->map_code_to_schema($endpoint, $app->res->code);
+	my $code = $app->res->code;
+	my $schema = $self->map_code_to_schema($endpoint, $code);
+	my $path = $endpoint->path;
+
+	if ($schema->empty) {
+		if ($code != 200) {
+			die "gave up trying to find a non-empty schema for $path"
+				if $code == 500;
+
+			$app->res->set_code(500);
+			my $error = $self->on_error($app, "empty schema for non-success code in $path (code $code)");
+			return $self->inhale_exhale($app, $endpoint, $error);
+		}
+
+		$app->res->set_code(204);
+	}
+	else {
+		$response = $self->wrap_response($response, $code);
+	}
+
+	if (!$schema) {
+
+		# make sure not to loop if code is already 500
+		die "gave up trying to find a schema for $path"
+			if $code == 500;
+
+		$app->res->set_code(500);
+		my $error = $self->on_error($app, "no data schema for $path (code $code)");
+		return $self->inhale_exhale($app, $endpoint, $error);
+	}
 
 	# try inhaling
 	if ($app->whelk->inhale_response) {
 		my $inhaled = $schema->inhale($response);
 		if (defined $inhaled) {
-			my $path = $endpoint->path;
 
 			# If this is an error with inhaling itself, we have to resort to
 			# throwing an exception to avoid an infinite recursion. This may
@@ -125,8 +152,7 @@ sub inhale_exhale
 			# otherwise, we can inhale_exhale again, this time with an error
 			$app->res->set_code(500);
 			my $error = $self->on_error($app, "response schema validation failed for $path: $inhaled");
-
-			return $self->inhale_exhale($app, $endpoint, $self->wrap_error($error), 1);
+			return $self->inhale_exhale($app, $endpoint, $error, 1);
 		}
 	}
 
@@ -136,8 +162,24 @@ sub inhale_exhale
 sub map_code_to_schema
 {
 	my ($self, $endpoint, $code) = @_;
+
 	my $code_class = int($code / 100) * 100;
 	return $endpoint->response_schemas->{$code_class};
+}
+
+sub wrap_response
+{
+	my ($self, $data, $code) = @_;
+	state $map = {
+		200 => 'success',
+		400 => 'client_error',
+		500 => 'server_error',
+	};
+
+	my $code_class = int($code / 100) * 100;
+	my $method = "wrap_$map->{$code_class}";
+
+	return $self->$method($data);
 }
 
 sub on_error
@@ -166,14 +208,21 @@ sub wrap
 	};
 }
 
-sub wrap_error
+sub wrap_server_error
 {
 	my ($self, $error) = @_;
 
 	...;
 }
 
-sub wrap_data
+sub wrap_client_error
+{
+	my ($self, $error) = @_;
+
+	return $self->wrap_server_error($error);
+}
+
+sub wrap_success
 {
 	my ($self, $data) = @_;
 

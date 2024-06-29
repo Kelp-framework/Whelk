@@ -3,14 +3,14 @@ package Whelk::Wrapper::Simple;
 use Kelp::Base 'Whelk::Wrapper';
 use Kelp::Exception;
 
-sub wrap_error
+sub wrap_server_error
 {
 	my ($self, $data) = @_;
 
 	return {error => $data};
 }
 
-sub wrap_data
+sub wrap_success
 {
 	my ($self, $data) = @_;
 

@@ -67,7 +67,11 @@ sub clone
 	my $data = dclone({%{$self}});
 	$data = Kelp::Util::merge($data, \%more_data, 1);
 	return $class->new(%$data);
+}
 
+sub empty
+{
+	return !!0;
 }
 
 sub exhale

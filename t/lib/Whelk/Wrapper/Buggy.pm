@@ -8,14 +8,14 @@ use Kelp::Base 'Whelk::Wrapper';
 # builtin errors (which are strings) to create a loop or failing inhales, which
 # should be broken at some point to avoid endless loop.
 
-sub wrap_error
+sub wrap_server_error
 {
 	my ($self, $data) = @_;
 
 	return {error => $data};
 }
 
-sub wrap_data
+sub wrap_success
 {
 	my ($self, $data) = @_;
 

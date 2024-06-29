@@ -23,6 +23,10 @@ $t->request(GET '/test/t1')
 	->code_is(200)
 	->json_cmp({success => JSON::PP::true, data => {id => 1337, name => 'elite'}});
 
+$t->request(GET '/test/nocontent')
+	->code_is(204)
+	->content_is('');
+
 $t->request(POST '/test/err')
 	->code_is(418)
 	->json_cmp({success => JSON::PP::false, error => "I'm a teapot"});

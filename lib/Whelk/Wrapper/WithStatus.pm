@@ -4,7 +4,7 @@ use Kelp::Base 'Whelk::Wrapper';
 
 use Whelk::Schema;
 
-sub wrap_error
+sub wrap_server_error
 {
 	my ($self, $data) = @_;
 
@@ -14,7 +14,7 @@ sub wrap_error
 	};
 }
 
-sub wrap_data
+sub wrap_success
 {
 	my ($self, $data) = @_;
 
@@ -30,17 +30,22 @@ sub build_response_schemas
 	my $schema = $endpoint->response_schema;
 	my $schemas = $endpoint->response_schemas;
 
-	$schemas->{200} = Whelk::Schema->build(
-		{
-			type => 'object',
-			properties => {
-				success => {
-					type => 'boolean',
+	if ($schema && $schema->empty) {
+		$schemas->{200} = $schema;
+	}
+	elsif ($schema) {
+		$schemas->{200} = Whelk::Schema->build(
+			{
+				type => 'object',
+				properties => {
+					success => {
+						type => 'boolean',
+					},
+					data => [$schema, required => !!1],
 				},
-				data => [$schema, required => !!1],
-			},
-		}
-	);
+			}
+		);
+	}
 
 	$schemas->{500} = $schemas->{400} = Whelk::Schema->build(
 		{

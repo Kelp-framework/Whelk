@@ -31,15 +31,6 @@ sub add_endpoint
 {
 	my ($self, $pattern, $args, %meta) = @_;
 
-	if (!$meta{response}) {
-		carp 'no response schema, setting flat null'
-			if $self->whelk->verbose;
-
-		$meta{response} = {
-			type => 'null',
-		};
-	}
-
 	# make sure we have hash (same as in Kelp)
 	$args = {
 		to => $args,

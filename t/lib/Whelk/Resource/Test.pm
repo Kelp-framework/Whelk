@@ -36,6 +36,16 @@ sub api
 	);
 
 	$self->add_endpoint(
+		[GET => '/nocontent'] => sub {
+			return undef;
+		},
+
+		response => {
+			type => 'empty',
+		},
+	);
+
+	$self->add_endpoint(
 		[POST => '/err'] => {
 			to => 'test#error_action',
 		},
