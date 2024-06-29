@@ -9,30 +9,29 @@ sub api
 	my ($self) = @_;
 
 	Whelk::Schema->build(
-		name => 'test_response',
-		type => 'object',
-		properties => {
-			opt_num => {
-				type => 'number',
-				required => !!0,
+		test_response => {
+			type => 'object',
+			properties => {
+				opt_num => {
+					type => 'number',
+					required => !!0,
+				},
+				req_str => {
+					type => 'string',
+				},
+				opt_bool => {
+					type => 'boolean',
+					required => !!0,
+				},
 			},
-			req_str => {
-				type => 'string',
-			},
-			opt_bool => {
-				type => 'boolean',
-				required => !!0,
-			},
-		},
+		}
 	);
 
 	$self->add_endpoint(
 		[GET => '/wrong_type'] => sub {
 			return [11];
 		},
-		response => {
-			name => \'test_response',
-		},
+		response => \'test_response',
 	);
 
 	$self->add_endpoint(
@@ -41,9 +40,7 @@ sub api
 				opt_num => 5,
 			};
 		},
-		response => {
-			name => \'test_response',
-		},
+		response => \'test_response',
 	);
 
 	$self->add_endpoint(
@@ -53,9 +50,7 @@ sub api
 				opt_num => 'this got mixed up',
 			};
 		},
-		response => {
-			name => \'test_response',
-		},
+		response => \'test_response',
 	);
 
 	$self->add_endpoint(
@@ -65,9 +60,7 @@ sub api
 				opt_bool => 'for sure not boolean',
 			};
 		},
-		response => {
-			name => \'test_response',
-		},
+		response => \'test_response',
 	);
 
 	$self->add_endpoint(

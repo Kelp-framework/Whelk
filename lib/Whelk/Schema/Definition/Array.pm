@@ -8,7 +8,8 @@ sub _resolve
 {
 	my ($self) = @_;
 
-	$self->properties($self->_build_nested($self->properties));
+	$self->properties($self->_build($self->properties))
+		if $self->properties;
 }
 
 sub inhale

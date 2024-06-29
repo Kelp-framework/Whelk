@@ -13,10 +13,9 @@ attr required => !!1;
 
 sub create
 {
-	my ($class, $type, %args) = @_;
+	my ($class, $args) = @_;
 
-	my $type_class = "${class}::" . ucfirst $type;
-	return Kelp::Util::load_package($type_class)->new(%args);
+	return $class->_build($args);
 }
 
 sub new
@@ -30,7 +29,7 @@ sub new
 
 sub _resolve { }
 
-sub _build_nested
+sub _build
 {
 	my ($self, $item) = @_;
 
@@ -42,19 +41,41 @@ sub _build_nested
 	}
 	elsif (ref $item eq 'ARRAY') {
 		my ($type, @rest) = @$item;
-		return $self->_build_nested($type)->clone(@rest);
+		return $self->_build($type)->clone(@rest);
+	}
+	elsif (ref $item eq 'HASH') {
+		my $type = delete $item->{type};
+		croak 'no schema definition type specified'
+			unless defined $type;
+
+		my $class = __PACKAGE__;
+		my $type_class = "${class}::" . ucfirst $type;
+		return Kelp::Util::load_package($type_class)->new(%$item);
 	}
 	else {
-		return Whelk::Schema->build($item);
+		croak 'can only build a definition from SCALAR, ARRAY or HASH';
 	}
 }
 
 sub clone
 {
-	my $self = shift;
+	my ($self, %more_data) = @_;
 	my $class = ref $self;
 
-	return bless {%$self, @_}, $class;
+	my %data = %$self;
+	foreach my $key (keys %more_data) {
+		if (ref $data{$key} eq ref $more_data{$key} && ref $data{$key} eq 'HASH') {
+			$data{$key} = {
+				%{$data{$key}},
+				%{$more_data{$key}},
+			};
+		}
+		else {
+			$data{$key} = $more_data{$key};
+		}
+	}
+
+	return bless \%data, $class;
 }
 
 sub exhale

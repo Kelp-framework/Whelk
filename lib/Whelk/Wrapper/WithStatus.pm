@@ -31,25 +31,29 @@ sub build_response_schemas
 	my $schemas = $endpoint->response_schemas;
 
 	$schemas->{200} = Whelk::Schema->build(
-		type => 'object',
-		properties => {
-			success => {
-				type => 'boolean',
+		{
+			type => 'object',
+			properties => {
+				success => {
+					type => 'boolean',
+				},
+				data => [$schema, required => !!1],
 			},
-			data => [$schema, required => !!1],
-		},
+		}
 	);
 
 	$schemas->{500} = $schemas->{400} = Whelk::Schema->build(
-		type => 'object',
-		properties => {
-			success => {
-				type => 'boolean',
+		{
+			type => 'object',
+			properties => {
+				success => {
+					type => 'boolean',
+				},
+				error => {
+					type => 'string',
+				},
 			},
-			error => {
-				type => 'string',
-			},
-		},
+		}
 	);
 }
 

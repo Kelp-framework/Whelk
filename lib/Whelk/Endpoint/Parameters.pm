@@ -29,8 +29,10 @@ sub build_schema
 	}
 
 	return Whelk::Schema->build(
-		type => 'object',
-		properties => $hashref,
+		{
+			type => 'object',
+			properties => $hashref,
+		}
 	);
 }
 

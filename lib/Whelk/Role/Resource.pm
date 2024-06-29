@@ -72,8 +72,8 @@ sub add_endpoint
 		code => $route->dest->[1],
 		request_format => $self->request_format,
 		response_format => $self->response_format,
-		request_schema => Whelk::Schema->build($meta{request}),
-		response_schema => Whelk::Schema->build($meta{response}),
+		request_schema => Whelk::Schema->build_if_defined($meta{request}),
+		response_schema => Whelk::Schema->build_if_defined($meta{response}),
 		parameters => Whelk::Endpoint::Parameters->new(%{$meta{parameters} // {}}),
 	);
 

@@ -12,7 +12,9 @@ use utf8;
 
 subtest 'should exhale null' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'null',
+		{
+			type => 'null',
+		}
 	);
 
 	is $schema->exhale(undef), undef, 'exhaled undef ok';
@@ -21,7 +23,9 @@ subtest 'should exhale null' => sub {
 
 subtest 'should exhale boolean' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'boolean',
+		{
+			type => 'boolean',
+		}
 	);
 
 	is $schema->exhale(1), JSON::PP::true, 'exhaled 1 ok';
@@ -32,7 +36,9 @@ subtest 'should exhale boolean' => sub {
 
 subtest 'should exhale number' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'number',
+		{
+			type => 'number',
+		}
 	);
 
 	is $schema->exhale(0), 0, 'exhaled 0 ok';
@@ -43,7 +49,9 @@ subtest 'should exhale number' => sub {
 
 subtest 'should exhale integer' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'integer',
+		{
+			type => 'integer',
+		}
 	);
 
 	is $schema->exhale(9), 9, 'exhaled 9 ok';
@@ -53,7 +61,9 @@ subtest 'should exhale integer' => sub {
 
 subtest 'should exhale string' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'string',
+		{
+			type => 'string',
+		}
 	);
 
 	is $schema->exhale(52), '52', 'exhaled 52 ok';
@@ -63,7 +73,9 @@ subtest 'should exhale string' => sub {
 
 subtest 'should exhale array' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'array',
+		{
+			type => 'array',
+		}
 	);
 
 	is_deeply $schema->exhale([]), [], 'exhaled empty array ok';
@@ -72,10 +84,12 @@ subtest 'should exhale array' => sub {
 
 subtest 'should exhale typed array' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'array',
-		properties => {
-			type => 'string',
-		},
+		{
+			type => 'array',
+			properties => {
+				type => 'string',
+			},
+		}
 	);
 
 	is_deeply $schema->exhale([]), [], 'exhaled empty array ok';
@@ -84,7 +98,9 @@ subtest 'should exhale typed array' => sub {
 
 subtest 'should exhale object' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'object',
+		{
+			type => 'object',
+		}
 	);
 
 	is_deeply $schema->exhale({}), {}, 'exhaled empty object ok';
@@ -93,25 +109,27 @@ subtest 'should exhale object' => sub {
 
 subtest 'should exhale typed object' => sub {
 	my $schema = Whelk::Schema->build(
-		type => 'object',
-		properties => {
-			bool => {
-				type => 'boolean',
-			},
-			int => {
-				type => 'integer',
-				required => !!0,
-			},
-			obj => {
-				type => 'object',
-				properties => {
-					nested => {
-						type => 'null',
-					}
+		{
+			type => 'object',
+			properties => {
+				bool => {
+					type => 'boolean',
 				},
-				required => !!0,
+				int => {
+					type => 'integer',
+					required => !!0,
+				},
+				obj => {
+					type => 'object',
+					properties => {
+						nested => {
+							type => 'null',
+						}
+					},
+					required => !!0,
+				},
 			},
-		},
+		}
 	);
 
 	is_deeply $schema->exhale({}), {}, 'exhaled empty object ok';

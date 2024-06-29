@@ -26,12 +26,14 @@ sub build_response_schemas
 	$schemas->{200} = $schema;
 
 	$schemas->{500} = $schemas->{400} = Whelk::Schema->build(
-		type => 'object',
-		properties => {
-			error => {
-				type => 'string',
+		{
+			type => 'object',
+			properties => {
+				error => {
+					type => 'string',
+				},
 			},
-		},
+		}
 	);
 }
 

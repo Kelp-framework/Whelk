@@ -11,7 +11,7 @@ sub _resolve
 	my $properties = $self->properties;
 	if ($properties) {
 		foreach my $key (keys %{$properties}) {
-			$properties->{$key} = $self->_build_nested($properties->{$key});
+			$properties->{$key} = $self->_build($properties->{$key});
 		}
 	}
 }

@@ -9,24 +9,34 @@ attr -definition => sub { die 'schema definition is required' };
 
 my %registered;
 
+sub build_if_defined
+{
+	my ($class, $args) = @_;
+
+	return undef unless defined $args;
+	return $class->build($args);
+}
+
 sub build
 {
-	my ($class, @args) = @_;
-	return undef if @args == 1 && !defined $args[0];
-	my %args = @args == 1 && ref $args[0] eq 'HASH' ? %{$args[0]} : @args;
+	my ($class, @input) = @_;
 
-	my $name = delete $args{name};
-	if (ref $name eq 'SCALAR') {
-		return $class->get_by_name($$name);
+	if (@input == 1) {
+		croak 'usage: build($args)'
+			unless ref $input[0];
+
+		unshift @input, undef;
+	}
+	else {
+		croak 'usage: build(name => $args)'
+			unless @input == 2 && !ref $input[0] && ref $input[1];
 	}
 
-	my $type = delete $args{type};
-	croak 'no schema definition type specified'
-		unless defined $type;
+	my ($name, $args) = @input;
 
 	my $self = $class->SUPER::new(
 		name => $name,
-		definition => Whelk::Schema::Definition->create($type, %args)
+		definition => Whelk::Schema::Definition->create($args)
 	);
 
 	croak "trying to reuse schema name $name"
