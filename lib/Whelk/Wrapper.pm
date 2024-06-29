@@ -77,10 +77,8 @@ sub inhale_exhale
 			# throwing an exception to avoid an infinite recursion. This may
 			# happen if the wrapper code has a bug in wrap_error and
 			# build_response_schemas.
-			Kelp::Exception->throw(
-				500,
-				body => "could not inhale error response for $path: $inhaled"
-			) if $inhale_error;
+			die "gave up trying to inhale error response for $path: $inhaled"
+				if $inhale_error;
 
 			# otherwise, we can inhale_exhale again, this time with an error
 			$app->res->set_code(500);
