@@ -6,6 +6,12 @@ use Whelk::Schema;
 # This tests creation and referencing of schemas
 ################################################################################
 
+subtest 'should return undef if passed undef' => sub {
+	my $schema = Whelk::Schema->build(undef);
+
+	is $schema, undef, 'schema ok';
+};
+
 subtest 'should create a simple schema and reference it back' => sub {
 	my $schema = Whelk::Schema->build(
 		name => 'some_schema',
@@ -19,6 +25,14 @@ subtest 'should create a simple schema and reference it back' => sub {
 	);
 
 	is $schema, $ref_schema, 'schema referencing ok';
+
+	my $ref_schema2 = Whelk::Schema->build(
+		{
+			name => \'some_schema',
+		}
+	);
+
+	is $schema, $ref_schema2, 'schema from hashref ok';
 };
 
 subtest 'should create a slightly complicated schema with references inside' => sub {

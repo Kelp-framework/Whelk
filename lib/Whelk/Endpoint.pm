@@ -11,7 +11,7 @@ attr -request_format => undef;
 attr -request_schema => undef;
 attr -response_format => sub { die 'response_format is required in endpoint' };
 attr -response_schema => sub { die 'response_schema is required in endpoint' };
-attr -parameters => sub { {} };
+attr -parameters => sub { die 'parameters are required in endpoint' };
 
 # to be built in wrapers
 attr -response_schemas => sub { {} };
@@ -34,15 +34,15 @@ sub _build_path
 		if $pattern =~ m/[*>?]/;
 
 	# Make path. First replace curlies with \0, same as in Kelp. Then adjust
-	# parameters to OpenAPI format. Last remove \0
+	# parameters to OpenAPI format. Lastly remove \0
 	my $path = $pattern;
 	$path =~ s/[{}]/\0/g;
 
 	while ($path =~ s/:(\w+)/{$1}/) {
 		my $token = $1;
 
-		# add path parameter
-		$self->parameters->{path}{$token}{required} = 1;
+		# add path parameter if not exists already
+		$self->parameters->path->{$token} //= {};
 	}
 
 	$path =~ s/\0//g;

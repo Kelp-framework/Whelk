@@ -6,13 +6,14 @@ use Role::Tiny;
 use Carp;
 
 use Whelk::Endpoint;
+use Whelk::Endpoint::Parameters;
 use Whelk::Schema;
 
 attr base_route => undef;
 attr wrapper => undef;
 
 attr response_format => sub { shift->config('default_format') };
-attr request_format => undef;
+attr request_format => sub { shift->config('default_format') };
 
 requires qw(
 	whelk
@@ -79,7 +80,7 @@ sub add_endpoint
 		response_format => $self->response_format,
 		request_schema => Whelk::Schema->build($meta{request}),
 		response_schema => Whelk::Schema->build($meta{response}),
-		parameters => $meta{parameters},
+		parameters => Whelk::Endpoint::Parameters->new(%{$meta{parameters} // {}}),
 	);
 
 	$route->dest->[0] //= ref $self;    # make sure plain subs work

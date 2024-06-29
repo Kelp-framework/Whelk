@@ -8,12 +8,56 @@ use HTTP::Status qw(status_message);
 use Kelp::Exception;
 use Whelk::Exception;
 
+sub inhale_request
+{
+	my ($self, $app, $endpoint, @args) = @_;
+	my $req = $app->req;
+	my $inhaled;
+
+	my $params = $endpoint->parameters;
+
+	if ($params->query_schema) {
+		$inhaled = $params->query_schema->inhale($req->query_parameters->as_hashref);
+		Whelk::Exception->throw(400, hint => "Query parameters error at: $inhaled")
+			if defined $inhaled;
+	}
+
+	if ($params->header_schema) {
+		my $headers = {map { $_ => $req->header($_) } $req->headers->header_field_names};
+		$inhaled = $params->header_schema->inhale($headers);
+		Whelk::Exception->throw(400, hint => "Header parameters error at: $inhaled")
+			if defined $inhaled;
+	}
+
+	if ($params->cookie_schema) {
+		$inhaled = $params->cookie_schema->inhale($req->cookies);
+		Whelk::Exception->throw(400, hint => "Cookie parameters error at: $inhaled")
+			if defined $inhaled;
+	}
+
+	if ($endpoint->request_schema) {
+		my $format = $endpoint->request_format;
+		my $method;
+
+		$method = "is_$format";
+		Whelk::Exception->throw(400, hint => "Invalid Content-Type")
+			unless $req->$method;
+
+		$method = "${format}_content";
+		$inhaled = $endpoint->request_schema->inhale($req->$method);
+
+		Whelk::Exception->throw(400, hint => "Content error at: $inhaled")
+			if defined $inhaled;
+	}
+}
+
 sub execute
 {
 	my ($self, $app, $endpoint, @args) = @_;
 
 	my ($success, $data);
 	try {
+		$self->inhale_request($app, $endpoint);
 		$data = $endpoint->code->($app, @args);
 		$success = 1;
 	}
@@ -42,21 +86,19 @@ sub prepare_response
 			# regular error page.
 			$data->throw unless $data->isa('Whelk::Exception');
 			$res->set_code($data->code);
-			$data = $data->body;
+			$data = $data->hint // $self->on_error($app, $data->body);
 		}
 		else {
 			$res->set_code(500);
+			$data = $self->on_error($app, $data);
 		}
-
-		$data = $self->on_error($app, $data);
 	}
 
 	# set code and content type
-	my $format = $app->response_format;
+	my $format = $endpoint->response_format;
 	$res->$format
 		unless $res->content_type;
 
-	# TODO: 204 no content
 	$success = int($res->code / 100) == 2;
 	my $response = $success ? $self->wrap_data($data) : $self->wrap_error($data);
 	return $self->inhale_exhale($app, $endpoint, $response);
@@ -115,13 +157,12 @@ sub wrap
 
 	return sub {
 		my $app = shift;
-		my $response = $self->prepare_response(
+
+		return $self->prepare_response(
 			$app,
 			$endpoint,
 			$self->execute($app, $endpoint, @_),
 		);
-
-		return $response;
 	};
 }
 
