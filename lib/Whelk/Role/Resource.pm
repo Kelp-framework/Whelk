@@ -15,12 +15,6 @@ attr wrapper => undef;
 attr response_format => sub { shift->whelk->default_format };
 attr request_format => sub { shift->whelk->default_format };
 
-requires qw(
-	whelk
-	routes
-	add_route
-);
-
 sub _controller
 {
 	my $self = shift;
