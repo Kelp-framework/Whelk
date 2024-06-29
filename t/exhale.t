@@ -64,6 +64,15 @@ subtest 'should exhale string' => sub {
 subtest 'should exhale array' => sub {
 	my $schema = Whelk::Schema->build(
 		type => 'array',
+	);
+
+	is_deeply $schema->exhale([]), [], 'exhaled empty array ok';
+	is_deeply $schema->exhale([1, 'ABC', {}]), [1, 'ABC', {}], 'exhaled array ok';
+};
+
+subtest 'should exhale typed array' => sub {
+	my $schema = Whelk::Schema->build(
+		type => 'array',
 		properties => {
 			type => 'string',
 		},
@@ -74,6 +83,15 @@ subtest 'should exhale array' => sub {
 };
 
 subtest 'should exhale object' => sub {
+	my $schema = Whelk::Schema->build(
+		type => 'object',
+	);
+
+	is_deeply $schema->exhale({}), {}, 'exhaled empty object ok';
+	is_deeply $schema->exhale({a => 1, b => 'str', c => []}), {a => 1, b => 'str', c => []}, 'exhaled object ok';
+};
+
+subtest 'should exhale typed object' => sub {
 	my $schema = Whelk::Schema->build(
 		type => 'object',
 		properties => {

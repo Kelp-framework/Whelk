@@ -2,13 +2,17 @@ package Whelk::Schema::Definition::Object;
 
 use Kelp::Base 'Whelk::Schema::Definition';
 
+attr properties => undef;
+
 sub _resolve
 {
 	my ($self) = @_;
 
 	my $properties = $self->properties;
-	foreach my $key (keys %{$properties}) {
-		$properties->{$key} = $self->_build_nested($properties->{$key});
+	if ($properties) {
+		foreach my $key (keys %{$properties}) {
+			$properties->{$key} = $self->_build_nested($properties->{$key});
+		}
 	}
 }
 
@@ -18,6 +22,8 @@ sub inhale
 
 	if (ref $value eq 'HASH') {
 		my $properties = $self->properties;
+		return undef unless $properties;
+
 		foreach my $key (keys %$properties) {
 			next if !exists $value->{$key} && !$properties->{$key}->required;
 
@@ -35,15 +41,16 @@ sub exhale
 {
 	my ($self, $value) = @_;
 
-	my %result;
 	my $properties = $self->properties;
+	return $value unless $properties;
+
 	foreach my $key (keys %$properties) {
 		next if !exists $value->{$key};
 
-		$result{$key} = $properties->{$key}->exhale($value->{$key});
+		$value->{$key} = $properties->{$key}->exhale($value->{$key});
 	}
 
-	return \%result;
+	return $value;
 }
 
 1;

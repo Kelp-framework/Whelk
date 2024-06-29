@@ -45,7 +45,7 @@ sub _build_nested
 		return $self->_build_nested($type)->clone(@rest);
 	}
 	else {
-		return Whelk::Schema->build(%$item);
+		return Whelk::Schema->build($item);
 	}
 }
 

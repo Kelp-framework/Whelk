@@ -75,11 +75,22 @@ subtest 'should inhale string' => sub {
 subtest 'should inhale array' => sub {
 	my $schema = Whelk::Schema->build(
 		type => 'array',
+	);
+
+	is $schema->inhale('no array'), 'array', 'inhaled string ok';
+	is $schema->inhale([]), undef, 'inhaled empty array ok';
+	is $schema->inhale([1, 'abc', [], {}]), undef, 'inhaled mixed array ok';
+};
+
+subtest 'should inhale typed array' => sub {
+	my $schema = Whelk::Schema->build(
+		type => 'array',
 		properties => {
 			type => 'string',
 		},
 	);
 
+	is $schema->inhale('no array'), 'array', 'inhaled string ok';
 	is $schema->inhale([]), undef, 'inhaled empty array ok';
 	is $schema->inhale([undef]), 'array[0]->defined', 'inhaled undef ok';
 	is $schema->inhale([undef, undef]), 'array[0]->defined', 'inhaled undef undef ok';
@@ -90,6 +101,16 @@ subtest 'should inhale array' => sub {
 };
 
 subtest 'should inhale object' => sub {
+	my $schema = Whelk::Schema->build(
+		type => 'object',
+	);
+
+	is $schema->inhale('not an object'), 'object', 'inhaled string ok';
+	is $schema->inhale({}), undef, 'inhaled empty object ok';
+	is $schema->inhale({a => 1, b => 'str', c => []}), undef, 'inhaled mixed object ok';
+};
+
+subtest 'should inhale typed object' => sub {
 	my $schema = Whelk::Schema->build(
 		type => 'object',
 		properties => {
@@ -112,6 +133,7 @@ subtest 'should inhale object' => sub {
 		},
 	);
 
+	is $schema->inhale('not an object'), 'object', 'inhaled string ok';
 	is $schema->inhale({}), 'object[bool]->defined', 'inhaled empty object ok';
 	is $schema->inhale({bool => 0}), undef, 'inhaled bool ok';
 	is $schema->inhale({int => -5}), 'object[bool]->defined', 'inhaled int ok';
