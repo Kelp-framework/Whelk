@@ -2,7 +2,7 @@ package Whelk::Schema::Definition::Boolean;
 
 use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
-use List::Util qw(any);
+use List::Util qw(none);
 
 sub inhale
 {
@@ -11,15 +11,14 @@ sub inhale
 	my $inhaled = $self->SUPER::inhale($value);
 	return $inhaled if defined $inhaled;
 
-	$inhaled = 'boolean'
-		unless any { $value eq $_ } (
-			1,
-			0,
-			!!1,
-			!!0,
-			JSON::PP::true,
-			JSON::PP::false,
-		);
+	if (ref $value) {
+		$inhaled = 'boolean'
+			if none { $value eq $_ } (JSON::PP::true, JSON::PP::false);
+	}
+	else {
+		$inhaled = 'boolean'
+			if none { $value eq $_ } (1, 0, !!1, !!0);
+	}
 
 	return $inhaled;
 }

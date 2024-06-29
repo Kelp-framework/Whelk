@@ -19,6 +19,10 @@ sub api
 			req_str => {
 				type => 'string',
 			},
+			opt_bool => {
+				type => 'boolean',
+				required => !!0,
+			},
 		},
 	);
 
@@ -47,6 +51,18 @@ sub api
 			return {
 				req_str => 42,
 				opt_num => 'this got mixed up',
+			};
+		},
+		response => {
+			name => \'test_response',
+		},
+	);
+
+	$self->add_endpoint(
+		[GET => '/not_a_bool'] => sub {
+			return {
+				req_str => 42,
+				opt_bool => 'for sure not boolean',
 			};
 		},
 		response => {

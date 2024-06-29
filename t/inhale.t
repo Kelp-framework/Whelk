@@ -29,6 +29,9 @@ subtest 'should inhale boolean' => sub {
 	is $schema->inhale(0), undef, 'inhaled 0 ok';
 	is $schema->inhale(1), undef, 'inhaled 1 ok';
 	is $schema->inhale([]), 'boolean', 'inhaled array ok';
+	is $schema->inhale('??'), 'boolean', 'inhaled string ok';
+	is $schema->inhale('for sure not boolean'), 'boolean', 'inhaled string ok';
+	is $schema->inhale(5), 'boolean', 'inhaled number ok';
 	is $schema->inhale(JSON::PP::true), undef, 'inhaled true ok';
 	is $schema->inhale(JSON::PP::false), undef, 'inhaled false ok';
 };

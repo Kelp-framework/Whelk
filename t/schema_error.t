@@ -27,6 +27,10 @@ $t->request(GET '/not_a_number')
 	->code_is(500)
 	->json_cmp({error => 'Internal Server Error'});
 
+$t->request(GET '/not_a_bool')
+	->code_is(500)
+	->json_cmp({error => 'Internal Server Error'});
+
 $t->request(GET '/error_object')
 	->code_is(403)
 	->json_cmp({error => 'Forbidden'});
