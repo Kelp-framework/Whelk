@@ -4,6 +4,7 @@ use Kelp::Base;
 use Carp;
 use Kelp::Util;
 use Scalar::Util qw(blessed);
+use Storable qw(dclone);
 
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
@@ -49,8 +50,9 @@ sub _build
 			unless defined $type;
 
 		my $class = __PACKAGE__;
-		my $type_class = "${class}::" . ucfirst $type;
-		return Kelp::Util::load_package($type_class)->new(%$item);
+		$type = ucfirst $type;
+
+		return Kelp::Util::load_package("${class}::${type}")->new(%$item);
 	}
 	else {
 		croak 'can only build a definition from SCALAR, ARRAY or HASH';
@@ -62,20 +64,10 @@ sub clone
 	my ($self, %more_data) = @_;
 	my $class = ref $self;
 
-	my %data = %$self;
-	foreach my $key (keys %more_data) {
-		if (ref $data{$key} eq ref $more_data{$key} && ref $data{$key} eq 'HASH') {
-			$data{$key} = {
-				%{$data{$key}},
-				%{$more_data{$key}},
-			};
-		}
-		else {
-			$data{$key} = $more_data{$key};
-		}
-	}
+	my $data = dclone({%{$self}});
+	$data = Kelp::Util::merge($data, \%more_data, 1);
+	return $class->new(%$data);
 
-	return bless \%data, $class;
 }
 
 sub exhale

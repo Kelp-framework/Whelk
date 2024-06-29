@@ -51,5 +51,37 @@ subtest 'should create a slightly complicated schema with references inside' => 
 	isa_ok $schema->properties->{bool}, 'Whelk::Schema::Definition::Boolean';
 };
 
+subtest 'should extend a schema with config merging' => sub {
+	my $to_extend = Whelk::Schema->build(
+		to_extend => {
+			type => 'object',
+			properties => {
+				a => {
+					type => 'integer',
+					required => !!0,
+				},
+			},
+		}
+	);
+
+	my $extended = Whelk::Schema->build(
+		[
+			\'to_extend',
+			properties => {
+				a => {
+					required => !!1,
+				},
+				b => {
+					type => 'string',
+				},
+			},
+		]
+	);
+
+	isnt $to_extend, $extended, 'schema looks extended ok';
+	is $extended->properties->{a}->required, !!1, 'required ok';
+	isa_ok $extended->properties->{b}, 'Whelk::Schema::Definition::String';
+};
+
 done_testing;
 
