@@ -12,8 +12,8 @@ use Whelk::Schema;
 attr base_route => undef;
 attr wrapper => undef;
 
-attr response_format => sub { shift->config('default_format') };
-attr request_format => sub { shift->config('default_format') };
+attr response_format => sub { shift->whelk->default_format };
+attr request_format => sub { shift->whelk->default_format };
 
 requires qw(
 	whelk

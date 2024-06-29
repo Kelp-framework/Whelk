@@ -7,8 +7,6 @@ attr data => sub {
 	return $self->merge(
 		$self->SUPER::data,
 		{
-			default_format => 'json',
-
 			modules => [qw(Whelk JSON YAML)],
 			modules_init => {
 				Routes => {

@@ -7,6 +7,7 @@ use Whelk::Schema;
 
 attr verbose => !!1;
 attr inhale_response => !!1;
+attr default_format => 'json';
 attr openapi_generator => undef;
 attr endpoints => sub { [] };
 
@@ -40,8 +41,12 @@ sub _load_config
 			resources
 			openapi
 			default_wrapper
+			default_format
 			);
 	}
+
+	$self->default_format($args->{default_format})
+		if defined $args->{default_format};
 }
 
 sub _initialize_resources
