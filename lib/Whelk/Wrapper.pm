@@ -11,26 +11,34 @@ use Whelk::Exception;
 
 sub supported_formats
 {
-	return qw(
-		application/json
-		text/yaml
-	);
+	return {
+		json => 'application/json',
+		yaml => 'text/yaml',
+	};
+}
+
+sub match_format
+{
+	my ($self, $app) = @_;
+	my $formats = $self->supported_formats;
+
+	foreach my $format (keys %$formats) {
+		return $format
+			if $app->req->content_type_is($formats->{$format});
+	}
+
+	Whelk::Exception->throw(400, hint => "Unsupported Content-Type");
 }
 
 sub get_request_body
 {
 	my ($self, $app) = @_;
-	my $req = $app->req;
+	my $format = $self->match_format($app);
 
-	if ($req->is_json) {
-		return $req->json_content;
-	}
-	elsif ($req->is_yaml) {
-		return $req->yaml_content;
-	}
-	else {
-		Whelk::Exception->throw(400, hint => "Unsupported Content-Type");
-	}
+	return
+		$format eq 'json' ? $app->req->json_content :
+		$format eq 'yaml' ? $app->req->yaml_content :
+		undef;
 }
 
 sub inhale_request
@@ -197,9 +205,8 @@ sub prepare_response
 		}
 	}
 
-	# set code and content type
-	my $format = $endpoint->response_format;
-	$res->$format
+	# set content type header
+	$res->set_content_type($endpoint->response_format, $res->charset // $app->charset)
 		unless $res->content_type;
 
 	return $self->exhale_response($app, $endpoint, $data);
