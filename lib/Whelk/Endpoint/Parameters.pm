@@ -3,7 +3,6 @@ package Whelk::Endpoint::Parameters;
 use Kelp::Base;
 
 use Carp;
-use List::Util qw(any);
 use Whelk::Schema;
 
 attr -path => sub { {} };
@@ -21,19 +20,21 @@ sub build_schema
 	my ($self, $hashref) = @_;
 	return undef if !%$hashref;
 
-	foreach my $key (keys %$hashref) {
-		my $item = $hashref->{$key};
-
-		croak 'Whelk only supports string, integer, number and boolean types in parameters'
-			unless any { $item->{type} eq $_ } qw(string integer number boolean);
-	}
-
-	return Whelk::Schema->build(
+	my $built = Whelk::Schema->build(
 		{
 			type => 'object',
 			properties => $hashref,
 		}
 	);
+
+	foreach my $key (keys %{$built->properties}) {
+		my $item = $built->properties->{$key};
+
+		croak 'Whelk only supports string, integer, number and boolean types in parameters'
+			unless $item->isa('Whelk::Schema::Definition::_Scalar');
+	}
+
+	return $built;
 }
 
 1;

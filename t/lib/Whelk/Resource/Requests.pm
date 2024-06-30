@@ -2,10 +2,17 @@ package Whelk::Resource::Requests;
 
 use Kelp::Base 'Whelk::Resource';
 use Whelk::Exception;
+use Whelk::Schema;
 
 sub api
 {
 	my ($self) = @_;
+
+	Whelk::Schema->build(
+		my_boolean => {
+			type => 'boolean',
+		},
+	);
 
 	$self->add_endpoint(
 		[GET => '/path/:test1'] => sub {
@@ -27,9 +34,7 @@ sub api
 				test1 => {
 					type => 'number',
 				},
-				test2 => {
-					type => 'boolean',
-				}
+				test2 => \'my_boolean',
 			},
 		},
 		response => {
@@ -91,9 +96,7 @@ sub api
 				'test1' => {
 					type => 'integer',
 				},
-				'test2' => {
-					type => 'boolean',
-				},
+				'test2' => \'my_boolean',
 			},
 		},
 		response => {

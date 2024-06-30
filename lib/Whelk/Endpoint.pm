@@ -50,8 +50,9 @@ sub _build_path
 		my $token = $1;
 
 		# add path parameter if not exists already and mark as required
-		$self->parameters->path->{$token}{type} //= 'string';
-		$self->parameters->path->{$token}{required} = !!1;
+		if (!$self->parameters->path->{$token}) {
+			$self->parameters->path->{$token}{type} = 'string';
+		}
 	}
 
 	$path =~ s/\0//g;
