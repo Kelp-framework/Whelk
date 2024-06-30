@@ -5,6 +5,7 @@ use Kelp::Util;
 use Carp;
 use Whelk::Schema;
 
+attr formatter => undef;
 attr verbose => !!1;
 attr inhale_response => !!1;
 attr default_format => 'json';
@@ -27,6 +28,10 @@ sub _load_config
 {
 	my ($self, $args) = @_;
 	my $app = $self->app;
+
+	$self->formatter(
+		Kelp::Util::load_package($args->{formatter_class} // 'Whelk::Formatter')->new
+	);
 
 	$self->verbose($args->{verbose})
 		if exists $args->{verbose};

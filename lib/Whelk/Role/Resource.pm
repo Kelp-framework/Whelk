@@ -77,8 +77,8 @@ sub add_endpoint
 	my $endpoint = Whelk::Endpoint->new(
 		route => $route,
 		code => $route->dest->[1],
-		request_formats => [values %{$self->wrapper->supported_formats}],
-		response_format => $self->wrapper->supported_formats->{$self->response_format},
+		request_formats => [values %{$self->whelk->formatter->supported_formats}],
+		response_format => $self->whelk->formatter->supported_formats->{$self->response_format},
 		request_schema => Whelk::Schema->build_if_defined($meta{request}),
 		response_schema => Whelk::Schema->build_if_defined($meta{response}),
 		parameters => Whelk::Endpoint::Parameters->new(%{$meta{parameters} // {}}),
