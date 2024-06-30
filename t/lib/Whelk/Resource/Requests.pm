@@ -8,9 +8,29 @@ sub api
 	my ($self) = @_;
 
 	$self->add_endpoint(
+		[GET => '/path/:test1'] => sub {
+			my ($self, @args) = @_;
+			return @args == 1 && $args[0] eq '25';
+		},
+		response => {
+			type => 'boolean',
+		}
+	);
+
+	$self->add_endpoint(
 		[GET => '/path/:test1/:test2'] => sub {
 			my ($self, @args) = @_;
-			return @args == 2 && $args[0] == 2 && $args[1] == 5;
+			return @args == 2 && $args[0] == 25 && $args[1];
+		},
+		parameters => {
+			path => {
+				test1 => {
+					type => 'number',
+				},
+				test2 => {
+					type => 'boolean',
+				}
+			},
 		},
 		response => {
 			type => 'boolean',

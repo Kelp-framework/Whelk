@@ -11,7 +11,7 @@ attr -query => sub { {} };
 attr -header => sub { {} };
 attr -cookie => sub { {} };
 
-# Path parameters are handled by Kelp, Whelk does not support schemas for it.
+attr -path_schema => sub { $_[0]->build_schema($_[0]->path) };
 attr -query_schema => sub { $_[0]->build_schema($_[0]->query) };
 attr -header_schema => sub { $_[0]->build_schema($_[0]->header) };
 attr -cookie_schema => sub { $_[0]->build_schema($_[0]->cookie) };
@@ -34,19 +34,6 @@ sub build_schema
 			properties => $hashref,
 		}
 	);
-}
-
-sub new
-{
-	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-
-	# build schemas to get any errors reported early
-	$self->query_schema;
-	$self->header_schema;
-	$self->cookie_schema;
-
-	return $self;
 }
 
 1;

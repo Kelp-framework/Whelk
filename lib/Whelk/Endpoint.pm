@@ -1,6 +1,7 @@
 package Whelk::Endpoint;
 
 use Kelp::Base;
+use Carp;
 use Whelk::Schema;
 
 attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
@@ -22,6 +23,13 @@ sub new
 	my $self = $class->SUPER::new(@_);
 
 	$self->path;    # builds path
+
+	# build schemas to get any errors reported early
+	$self->parameters->path_schema;
+	$self->parameters->query_schema;
+	$self->parameters->header_schema;
+	$self->parameters->cookie_schema;
+
 	return $self;
 }
 
@@ -30,7 +38,7 @@ sub _build_path
 	my ($self) = @_;
 	my $pattern = $self->route->pattern;
 
-	die 'only :normal placeholders are allowed in Whelk'
+	croak 'only :normal placeholders are allowed in Whelk'
 		if $pattern =~ m/[*>?]/;
 
 	# Make path. First replace curlies with \0, same as in Kelp. Then adjust
@@ -41,8 +49,9 @@ sub _build_path
 	while ($path =~ s/:(\w+)/{$1}/) {
 		my $token = $1;
 
-		# add path parameter if not exists already
-		$self->parameters->path->{$token} //= {};
+		# add path parameter if not exists already and mark as required
+		$self->parameters->path->{$token}{type} //= 'string';
+		$self->parameters->path->{$token}{required} = !!1;
 	}
 
 	$path =~ s/\0//g;

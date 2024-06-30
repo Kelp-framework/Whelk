@@ -17,6 +17,12 @@ sub inhale_request
 
 	my $params = $endpoint->parameters;
 
+	if ($params->path_schema) {
+		$inhaled = $params->path_schema->inhale($req->named);
+		Whelk::Exception->throw(400, hint => "Path parameters error at: $inhaled")
+			if defined $inhaled;
+	}
+
 	if ($params->query_schema) {
 		$inhaled = $params->query_schema->inhale($req->query_parameters->as_hashref);
 		Whelk::Exception->throw(400, hint => "Query parameters error at: $inhaled")
