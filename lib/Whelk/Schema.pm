@@ -5,7 +5,7 @@ use Whelk::Schema::Definition;
 use Carp;
 
 attr -name => undef;
-attr -definition => sub { die 'schema definition is required' };
+attr -definition => sub { croak 'schema definition is required' };
 
 my %registered;
 

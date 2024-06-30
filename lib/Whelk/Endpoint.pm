@@ -5,14 +5,14 @@ use Carp;
 use Whelk::Schema;
 
 attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
-attr -route => sub { die 'route is required in endpoint' };
-attr -code => sub { die 'code is required in endpoint' };
+attr -route => sub { croak 'route is required in endpoint' };
+attr -code => sub { croak 'code is required in endpoint' };
 attr -path => \&_build_path;
 attr -request_format => undef;
 attr -request_schema => undef;
-attr -response_format => sub { die 'response_format is required in endpoint' };
-attr -response_schema => sub { die 'response_schema is required in endpoint' };
-attr -parameters => sub { die 'parameters are required in endpoint' };
+attr -response_format => sub { croak 'response_format is required in endpoint' };
+attr -response_schema => sub { croak 'response_schema is required in endpoint' };
+attr -parameters => sub { croak 'parameters are required in endpoint' };
 
 # to be built in wrapers
 attr -response_schemas => sub { {} };
