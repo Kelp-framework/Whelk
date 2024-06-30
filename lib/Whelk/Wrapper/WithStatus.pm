@@ -48,8 +48,8 @@ sub build_response_schemas
 		);
 	}
 
-	$schemas->{500} = $schemas->{400} = Whelk::Schema->build(
-		{
+	$schemas->{500} = $schemas->{400} = Whelk::Schema->get_or_build(
+		api_error_with_status => {
 			type => 'object',
 			properties => {
 				success => {

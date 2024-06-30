@@ -1,11 +1,8 @@
 package Whelk::Schema;
 
-use Kelp::Base;
+use Kelp::Base -strict;
 use Whelk::Schema::Definition;
 use Carp;
-
-attr -name => undef;
-attr -definition => sub { croak 'schema definition is required' };
 
 my %registered;
 
@@ -33,19 +30,26 @@ sub build
 	}
 
 	my ($name, $args) = @input;
+	my $self = Whelk::Schema::Definition->create($args);
+	$self->name($name);
 
-	my $self = $class->SUPER::new(
-		name => $name,
-		definition => Whelk::Schema::Definition->create($args)
-	);
-
-	croak "trying to reuse schema name $name"
+	croak "trying to reuse schema name " . $self->name
 		if $self->name && $registered{$self->name};
 
 	$registered{$self->name} = $self
 		if $self->name;
 
-	return $self->definition;
+	return $self;
+}
+
+sub get_or_build
+{
+	my ($class, $name, $args) = @_;
+
+	return $registered{$name}
+		if $registered{$name};
+
+	return $class->build($name, $args);
 }
 
 sub get_by_name
@@ -55,14 +59,14 @@ sub get_by_name
 	croak "no such referenced schema '$name'"
 		unless $registered{$name};
 
-	return $registered{$name}->definition;
+	return $registered{$name};
 }
 
 sub all_schemas
 {
 	my ($class) = @_;
 
-	return [map { $registered{$_} } sort keys %registered];
+	return [values %registered];
 }
 
 1;

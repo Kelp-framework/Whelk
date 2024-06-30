@@ -83,5 +83,33 @@ subtest 'should extend a schema with config merging' => sub {
 	isa_ok $extended->properties->{b}, 'Whelk::Schema::Definition::String';
 };
 
+subtest 'should be able to create a new schema by extending' => sub {
+	my $to_extend = Whelk::Schema->build(
+		base => {
+			type => 'object',
+			properties => {
+				a => {
+					type => 'integer',
+				},
+			},
+		}
+	);
+
+	my $extended = Whelk::Schema->build(
+		extension => [
+			\'base',
+			properties => {
+				b => {
+					type => 'string',
+				},
+			},
+		]
+	);
+
+	isnt $to_extend, $extended, 'schema looks extended ok';
+	is $to_extend->name, 'base', 'base name ok';
+	is $extended->name, 'extension', 'extension name ok';
+};
+
 done_testing;
 

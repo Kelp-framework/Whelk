@@ -9,6 +9,7 @@ use Storable qw(dclone);
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
 
+attr name => undef;
 attr required => !!1;
 
 sub create
@@ -20,8 +21,14 @@ sub create
 
 sub new
 {
-	my $class = shift;
-	my $self = $class->SUPER::new(@_);
+	my ($class, %args) = @_;
+
+	# don't allow to set the name through the constructor. This would not
+	# correctly register the schema. Schemas are correctly built and registered
+	# through Whelk::Schema factory.
+	delete $args{name};
+
+	my $self = $class->SUPER::new(%args);
 
 	$self->_resolve;
 	return $self;
@@ -41,7 +48,8 @@ sub _build
 	}
 	elsif (ref $item eq 'ARRAY') {
 		my ($type, @rest) = @$item;
-		return $self->_build($type)->clone(@rest);
+		my $ret = $self->_build($type)->clone(@rest);
+		return $ret;
 	}
 	elsif (ref $item eq 'HASH') {
 		my $type = delete $item->{type};
@@ -62,6 +70,9 @@ sub clone
 {
 	my ($self, %more_data) = @_;
 	my $class = ref $self;
+
+	# NOTE: since cloning uses the constructor, the name is automatically
+	# removed from the resulting object.
 
 	my $data = dclone({%{$self}});
 	$data = Kelp::Util::merge($data, \%more_data, 1);
