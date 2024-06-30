@@ -149,6 +149,7 @@ subtest 'should inhale typed object' => sub {
 						}
 					},
 					required => !!0,
+					strict => !!1,
 				},
 			},
 		}
@@ -163,6 +164,9 @@ subtest 'should inhale typed object' => sub {
 	is $schema->inhale({bool => 1, obj => {nested => 1}}), 'object[obj]->object[nested]->null',
 		'inhaled bool obj 1 ok';
 	is $schema->inhale({bool => 1, obj => {nested => undef}}), undef, 'inhaled bool obj undef ok';
+	is $schema->inhale({bool => 1, more => 2}), undef, 'inhaled bool more ok';
+	is $schema->inhale({bool => 1, obj => {nested => undef, more => 2}}), 'object[obj]->object[more]->redundant',
+		'inhaled bool obj undef more ok';
 };
 
 done_testing;

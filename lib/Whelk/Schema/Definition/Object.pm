@@ -3,6 +3,7 @@ package Whelk::Schema::Definition::Object;
 use Kelp::Base 'Whelk::Schema::Definition';
 
 attr properties => undef;
+attr strict => !!0;
 
 sub _resolve
 {
@@ -29,6 +30,13 @@ sub inhale
 
 			my $inhaled = $properties->{$key}->inhale($value->{$key});
 			return "object[$key]->$inhaled" if defined $inhaled;
+		}
+
+		if ($self->strict && keys %$value > keys %$properties) {
+			foreach my $key (keys %$value) {
+				next if exists $properties->{$key};
+				return "object[$key]->redundant";
+			}
 		}
 
 		return undef;
