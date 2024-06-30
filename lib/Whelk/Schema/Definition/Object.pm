@@ -26,7 +26,12 @@ sub inhale
 		return undef unless $properties;
 
 		foreach my $key (keys %$properties) {
-			next if !exists $value->{$key} && !$properties->{$key}->required;
+			if (!exists $value->{$key}) {
+				return "object[$key]->required"
+					if $properties->{$key}->required;
+
+				next;
+			}
 
 			my $inhaled = $properties->{$key}->inhale($value->{$key});
 			return "object[$key]->$inhaled" if defined $inhaled;
@@ -53,7 +58,7 @@ sub exhale
 	return $value unless $properties;
 
 	foreach my $key (keys %$properties) {
-		next if !exists $value->{$key};
+		next if !exists $value->{$key} && !$properties->{$key}->has_default;
 
 		$value->{$key} = $properties->{$key}->exhale($value->{$key});
 	}

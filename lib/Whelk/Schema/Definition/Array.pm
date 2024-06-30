@@ -3,6 +3,7 @@ package Whelk::Schema::Definition::Array;
 use Kelp::Base 'Whelk::Schema::Definition';
 
 attr properties => undef;
+attr lax => !!0;
 
 sub _resolve
 {
@@ -27,6 +28,15 @@ sub inhale
 
 		return undef;
 	}
+	elsif ($self->lax) {
+		my $type = $self->properties;
+		return undef unless $type;
+
+		my $inhaled = $type->inhale($value);
+		return "array[0]->$inhaled" if defined $inhaled;
+
+		return undef;
+	}
 
 	return 'array';
 }
@@ -34,6 +44,10 @@ sub inhale
 sub exhale
 {
 	my ($self, $value) = @_;
+
+	if (ref $value ne 'ARRAY' && $self->lax) {
+		$value = [$value];
+	}
 
 	my $type = $self->properties;
 	return $value unless $type;

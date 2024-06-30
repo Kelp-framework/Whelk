@@ -17,12 +17,12 @@ my $t = Kelp::Test->new(app => $app);
 
 $t->request(GET '/cookie')
 	->code_is(400)
-	->json_cmp({error => re(qr{Cookie parameters .+->defined})});
+	->json_cmp({error => re(qr{Cookie parameters .+->required})});
 
 $t->cookies->set_cookie(0, test1 => 25);
 $t->request(GET '/cookie')
 	->code_is(400)
-	->json_cmp({error => re(qr{Cookie parameters .+\[test2\]->defined})});
+	->json_cmp({error => re(qr{Cookie parameters .+\[test2\]->required})});
 
 $t->cookies->set_cookie(0, test1 => 25.5);
 $t->cookies->set_cookie(0, test2 => '');

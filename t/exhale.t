@@ -96,6 +96,20 @@ subtest 'should exhale typed array' => sub {
 	is_deeply $schema->exhale([qw(abc def), 52]), [qw(abc def 52)], 'exhaled array ok';
 };
 
+subtest 'should exhale lax array' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'array',
+			lax => !!1,
+		}
+	);
+
+	is_deeply $schema->exhale(1), [1], 'exhaled int ok';
+	is_deeply $schema->exhale([]), [], 'exhaled empty array ok';
+	is_deeply $schema->exhale([1]), [1], 'exhaled int in array ok';
+	is_deeply $schema->exhale([1, 2]), [1, 2], 'exhaled two ints in array ok';
+};
+
 subtest 'should exhale object' => sub {
 	my $schema = Whelk::Schema->build(
 		{
@@ -136,6 +150,37 @@ subtest 'should exhale typed object' => sub {
 	is_deeply $schema->exhale({bool => 1}), {bool => JSON::PP::true}, 'exhaled bool ok';
 	is_deeply $schema->exhale({bool => 1, obj => {nested => 5}}),
 		{bool => JSON::PP::true, obj => {nested => undef}}, 'exhaled bool and obj ok';
+};
+
+subtest 'should exhale defaults' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'object',
+			properties => {
+				int => {
+					type => 'integer',
+					default => 15,
+				},
+				obj => {
+					type => 'object',
+					properties => {
+						str => {
+							type => 'string',
+							default => 'holy moly',
+						}
+					},
+					required => !!0,
+				},
+			},
+		}
+	);
+
+	is_deeply $schema->exhale({}), {int => 15}, 'exhaled empty object ok';
+	is_deeply $schema->exhale({int => 3}), {int => 3}, 'exhaled int ok';
+	is_deeply $schema->exhale({obj => {}}), {int => 15, obj => {str => 'holy moly'}},
+		'exhaled nested object default ok';
+	is_deeply $schema->exhale({obj => {str => 'tt'}}), {int => 15, obj => {str => 'tt'}},
+		'exhaled nested object ok';
 };
 
 done_testing;

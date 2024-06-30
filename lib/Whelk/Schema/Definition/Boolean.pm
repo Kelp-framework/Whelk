@@ -4,11 +4,11 @@ use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
 use List::Util qw(none);
 
-sub inhale
+sub _inhale
 {
 	my ($self, $value) = @_;
 
-	my $inhaled = $self->SUPER::inhale($value);
+	my $inhaled = $self->SUPER::_inhale($value);
 	return $inhaled if defined $inhaled;
 
 	if (ref $value) {
@@ -23,7 +23,7 @@ sub inhale
 	return $inhaled;
 }
 
-sub exhale
+sub _exhale
 {
 	return pop() ? JSON::PP::true : JSON::PP::false;
 }

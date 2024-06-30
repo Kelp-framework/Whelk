@@ -11,20 +11,48 @@ use Whelk::Schema;
 
 attr base_route => undef;
 attr wrapper => undef;
-
 attr response_format => sub { shift->whelk->default_format };
-attr request_format => sub { shift->whelk->default_format };
 
-sub _controller
+sub _whelk_adjust_pattern
 {
-	my $self = shift;
+	my ($self, $pattern) = @_;
+
+	# we don't handle regex
+	croak 'Regex patterns are disallowed in Whelk'
+		unless !ref $pattern;
+
+	# glue up the route from base and used patterns
+	$pattern = $self->base_route . $pattern;
+	$pattern =~ s{/$}{};
+	$pattern =~ s{/+}{/};
+
+	return $pattern;
+}
+
+sub _whelk_adjust_to
+{
+	my ($self, $to) = @_;
+
 	my $base = $self->routes->base;
 	my $class = ref $self;
 	if ($class !~ s/^${base}:://) {
 		$class = "+$class";
 	}
 
-	return $class;
+	if (!ref $to && $to !~ m{^\+|#|::}) {
+		my $join = $class =~ m{#} ? '#' : '::';
+		$to = join $join, $class, $to;
+	}
+
+	return $to;
+}
+
+sub request_body
+{
+	my ($self) = @_;
+
+	# this is set by wrapper when there is request body validation
+	return $self->stash->{request};
 }
 
 sub add_endpoint
@@ -42,34 +70,21 @@ sub add_endpoint
 		$pattern = $pattern->[1];
 	}
 
-	# we don't handle regex
-	croak 'Regex patterns are disallowed in Whelk'
-		unless !ref $pattern;
-
-	# glue up the route from base and used patterns
-	$pattern = $self->base_route . $pattern;
-	$pattern =~ s{/$}{};
-	$pattern =~ s{/+}{/};
-
-	if (!ref $args->{to} && $args->{to} !~ m{^\+|#|::}) {
-		my $controller = $self->_controller;
-		my $join = $controller =~ m{#} ? '#' : '::';
-		$args->{to} = $controller . $join . $args->{to};
-	}
+	$pattern = $self->_whelk_adjust_pattern($pattern);
+	$args->{to} = $self->_whelk_adjust_to($args->{to});
 	my $route = $self->add_route($pattern, $args)->parent;
 
 	my $endpoint = Whelk::Endpoint->new(
 		route => $route,
 		code => $route->dest->[1],
-		request_format => $self->request_format,
+		request_formats => [$self->wrapper->supported_formats],
 		response_format => $self->response_format,
 		request_schema => Whelk::Schema->build_if_defined($meta{request}),
 		response_schema => Whelk::Schema->build_if_defined($meta{response}),
 		parameters => Whelk::Endpoint::Parameters->new(%{$meta{parameters} // {}}),
 	);
 
-	$route->dest->[0] //= ref $self;    # make sure plain subs work
-	$route->dest->[1] = $self->wrapper->wrap($endpoint);
+	$endpoint->wrap($self);
 
 	push @{$self->whelk->endpoints}, $endpoint;
 	return $self;

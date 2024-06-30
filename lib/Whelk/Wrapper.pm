@@ -9,6 +9,30 @@ use Kelp::Exception;
 use Whelk::Schema;
 use Whelk::Exception;
 
+sub supported_formats
+{
+	return qw(
+		application/json
+		text/yaml
+	);
+}
+
+sub get_request_body
+{
+	my ($self, $app) = @_;
+	my $req = $app->req;
+
+	if ($req->is_json) {
+		return $req->json_content;
+	}
+	elsif ($req->is_yaml) {
+		return $req->yaml_content;
+	}
+	else {
+		Whelk::Exception->throw(400, hint => "Unsupported Content-Type");
+	}
+}
+
 sub inhale_request
 {
 	my ($self, $app, $endpoint, @args) = @_;
@@ -18,44 +42,116 @@ sub inhale_request
 	my $params = $endpoint->parameters;
 
 	if ($params->path_schema) {
-		$inhaled = $params->path_schema->inhale($req->named);
-		Whelk::Exception->throw(400, hint => "Path parameters error at: $inhaled")
-			if defined $inhaled;
+		$params->path_schema->inhale_or_error(
+			$req->named,
+			sub {
+				Whelk::Exception->throw(400, hint => "Path parameters error at: $_[0]");
+			}
+		);
 	}
 
 	if ($params->query_schema) {
-		$inhaled = $params->query_schema->inhale($req->query_parameters->as_hashref);
-		Whelk::Exception->throw(400, hint => "Query parameters error at: $inhaled")
-			if defined $inhaled;
+		my $new_query = $params->query_schema->inhale_exhale(
+			$req->query_parameters->mixed,
+			sub {
+				Whelk::Exception->throw(400, hint => "Query parameters error at: $_[0]");
+			}
+		);
+
+		# adjust the parameters in the request itself to allow all calls of
+		# ->param and ->query_param to just work
+		$req->query_parameters->clear->merge_mixed($new_query);
+		$req->parameters->clear->merge_mixed($new_query)->merge_mixed($req->body_parameters->mixed);
 	}
 
 	if ($params->header_schema) {
-		my $headers = {map { $_ => $req->header($_) } $req->headers->header_field_names};
-		$inhaled = $params->header_schema->inhale($headers);
-		Whelk::Exception->throw(400, hint => "Header parameters error at: $inhaled")
-			if defined $inhaled;
+		my %headers;
+		foreach my $key ($req->headers->header_field_names) {
+			my @values = map { split /, /, $_ } $req->header($key);
+			$headers{$key} = @values == 1 ? $values[0] : \@values;
+		}
+
+		$params->header_schema->inhale_or_error(
+			\%headers,
+			sub {
+				Whelk::Exception->throw(400, hint => "Header parameters error at: $_[0]");
+			}
+		);
 	}
 
 	if ($params->cookie_schema) {
-		$inhaled = $params->cookie_schema->inhale($req->cookies);
-		Whelk::Exception->throw(400, hint => "Cookie parameters error at: $inhaled")
-			if defined $inhaled;
+		$params->cookie_schema->inhale_or_error(
+			$req->cookies,
+			sub {
+				Whelk::Exception->throw(400, hint => "Cookie parameters error at: $_[0]");
+			}
+		);
 	}
 
 	if ($endpoint->request_schema) {
-		my $format = $endpoint->request_format;
-		my $method;
-
-		$method = "is_$format";
-		Whelk::Exception->throw(400, hint => "Invalid Content-Type")
-			unless $req->$method;
-
-		$method = "${format}_content";
-		$inhaled = $endpoint->request_schema->inhale($req->$method);
-
-		Whelk::Exception->throw(400, hint => "Content error at: $inhaled")
-			if defined $inhaled;
+		$app->stash->{request} = $endpoint->request_schema->inhale_exhale(
+			$self->get_request_body($app),
+			sub {
+				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");
+			}
+		);
 	}
+}
+
+sub exhale_response
+{
+	my ($self, $app, $endpoint, $response, $inhale_error) = @_;
+	my $code = $app->res->code;
+	my $schema = $self->map_code_to_schema($endpoint, $code);
+	my $path = $endpoint->path;
+
+	if ($schema->empty) {
+		if ($code != 200) {
+			die "gave up trying to find a non-empty schema for $path"
+				if $code == 500;
+
+			$app->res->set_code(500);
+			my $error = $self->on_error($app, "empty schema for non-success code in $path (code $code)");
+			return $self->exhale_response($app, $endpoint, $error);
+		}
+
+		$app->res->set_code(204);
+	}
+	else {
+		$response = $self->wrap_response($response, $code);
+	}
+
+	if (!$schema) {
+
+		# make sure not to loop if code is already 500
+		die "gave up trying to find a schema for $path"
+			if $code == 500;
+
+		$app->res->set_code(500);
+		my $error = $self->on_error($app, "no data schema for $path (code $code)");
+		return $self->exhale_response($app, $endpoint, $error);
+	}
+
+	# try inhaling
+	if ($app->whelk->inhale_response) {
+		my $inhaled = $schema->inhale($response);
+		if (defined $inhaled) {
+
+			# If this is an error with inhaling itself, we have to resort to
+			# throwing an exception to avoid an infinite recursion. This may
+			# happen if the wrapper code has a bug in wrap_error and
+			# build_response_schemas.
+			die "gave up trying to inhale error response for $path: $inhaled"
+				if $inhale_error;
+
+			# otherwise, we can exhale_response again, this time with an error
+			$app->res->set_code(500);
+			my $error = $self->on_error($app, "response schema validation failed for $path: $inhaled");
+			return $self->exhale_response($app, $endpoint, $error, 1);
+		}
+	}
+
+	return $schema->exhale($response);
 }
 
 sub execute
@@ -106,63 +202,7 @@ sub prepare_response
 	$res->$format
 		unless $res->content_type;
 
-	return $self->inhale_exhale($app, $endpoint, $data);
-}
-
-sub inhale_exhale
-{
-	my ($self, $app, $endpoint, $response, $inhale_error) = @_;
-	my $code = $app->res->code;
-	my $schema = $self->map_code_to_schema($endpoint, $code);
-	my $path = $endpoint->path;
-
-	if ($schema->empty) {
-		if ($code != 200) {
-			die "gave up trying to find a non-empty schema for $path"
-				if $code == 500;
-
-			$app->res->set_code(500);
-			my $error = $self->on_error($app, "empty schema for non-success code in $path (code $code)");
-			return $self->inhale_exhale($app, $endpoint, $error);
-		}
-
-		$app->res->set_code(204);
-	}
-	else {
-		$response = $self->wrap_response($response, $code);
-	}
-
-	if (!$schema) {
-
-		# make sure not to loop if code is already 500
-		die "gave up trying to find a schema for $path"
-			if $code == 500;
-
-		$app->res->set_code(500);
-		my $error = $self->on_error($app, "no data schema for $path (code $code)");
-		return $self->inhale_exhale($app, $endpoint, $error);
-	}
-
-	# try inhaling
-	if ($app->whelk->inhale_response) {
-		my $inhaled = $schema->inhale($response);
-		if (defined $inhaled) {
-
-			# If this is an error with inhaling itself, we have to resort to
-			# throwing an exception to avoid an infinite recursion. This may
-			# happen if the wrapper code has a bug in wrap_error and
-			# build_response_schemas.
-			die "gave up trying to inhale error response for $path: $inhaled"
-				if $inhale_error;
-
-			# otherwise, we can inhale_exhale again, this time with an error
-			$app->res->set_code(500);
-			my $error = $self->on_error($app, "response schema validation failed for $path: $inhaled");
-			return $self->inhale_exhale($app, $endpoint, $error, 1);
-		}
-	}
-
-	return $schema->exhale($response);
+	return $self->exhale_response($app, $endpoint, $data);
 }
 
 sub map_code_to_schema

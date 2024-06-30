@@ -18,7 +18,7 @@ $t->request(
 	POST '/body',
 	)
 	->code_is(400)
-	->json_cmp({error => 'Invalid Content-Type'});
+	->json_cmp({error => 'Unsupported Content-Type'});
 
 $t->request(
 	POST '/body',
@@ -41,7 +41,7 @@ $t->request(
 	Content => '{}',
 	)
 	->code_is(400)
-	->json_cmp({error => 'Content error at: object[test]->defined'});
+	->json_cmp({error => 'Content error at: object[test]->required'});
 
 $t->request(
 	POST '/body',

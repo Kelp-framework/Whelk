@@ -2,17 +2,17 @@ package Whelk::Schema::Definition::String;
 
 use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
 
-sub inhale
+sub _inhale
 {
 	my ($self, $value) = @_;
 
-	my $inhaled = $self->SUPER::inhale($value);
+	my $inhaled = $self->SUPER::_inhale($value);
 	return $inhaled if defined $inhaled;
 	return 'string' if ref $value;
 	return undef;
 }
 
-sub exhale
+sub _exhale
 {
 	return '' . pop();
 }

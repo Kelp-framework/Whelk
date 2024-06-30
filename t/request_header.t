@@ -17,11 +17,11 @@ my $t = Kelp::Test->new(app => $app);
 
 $t->request(GET '/header')
 	->code_is(400)
-	->json_cmp({error => re(qr{Header parameters .+->defined})});
+	->json_cmp({error => re(qr{Header parameters .+->required})});
 
 $t->request(GET '/header', 'X-test1' => 25)
 	->code_is(400)
-	->json_cmp({error => re(qr{Header parameters .+\[X-Test2\]->defined})});
+	->json_cmp({error => re(qr{Header parameters .+\[X-Test2\]->required})});
 
 $t->request(GET '/header', 'X-test1' => 25.5, 'X-test2' => '')
 	->code_is(400)

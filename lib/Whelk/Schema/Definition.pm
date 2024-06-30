@@ -9,7 +9,6 @@ use Storable qw(dclone);
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
 
-attr properties => sub { {} };
 attr required => !!1;
 
 sub create
@@ -74,13 +73,41 @@ sub empty
 	return !!0;
 }
 
+sub has_default
+{
+	return !!0;
+}
+
+sub inhale_exhale
+{
+	my ($self, $data, $error_sub) = @_;
+
+	$self->inhale_or_error($data, $error_sub);
+	return $self->exhale($data);
+}
+
+sub inhale_or_error
+{
+	my ($self, $data, $error_sub) = @_;
+
+	my $inhaled = $self->inhale($data);
+	if (defined $inhaled) {
+		$error_sub->($inhaled);
+		die 'inhale_or_error error subroutine did not throw an exception';
+	}
+
+	return undef;
+}
+
 sub exhale
 {
+	my ($self, $value) = @_;
 	...;
 }
 
 sub inhale
 {
+	my ($self, $value) = @_;
 	...;
 }
 

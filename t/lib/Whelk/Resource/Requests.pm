@@ -45,6 +45,7 @@ sub api
 	$self->add_endpoint(
 		[GET => '/query'] => sub {
 			my $self = shift;
+			$self->res->set_header(X_Default => $self->param('def'));
 			return $self->param('test1') == 25 && $self->param('test2');
 		},
 		parameters => {
@@ -54,6 +55,32 @@ sub api
 				},
 				test2 => {
 					type => 'boolean',
+				},
+				def => {
+					type => 'string',
+					default => 'a default',
+				},
+			},
+		},
+		response => {
+			type => 'boolean',
+		},
+	);
+
+	$self->add_endpoint(
+		[GET => '/multiquery'] => sub {
+			my $self = shift;
+			my @args = $self->req->query_parameters->get_all('test');
+			return @args == 2 && $args[0] == 2 && $args[1] == 5;
+		},
+		parameters => {
+			query => {
+				test => {
+					type => 'array',
+					lax => !!1,
+					properties => {
+						type => 'integer',
+					},
 				},
 			},
 		},
@@ -85,6 +112,28 @@ sub api
 	);
 
 	$self->add_endpoint(
+		[GET => '/multiheader'] => sub {
+			my $self = shift;
+			my @args = map { split ', ', $_ } $self->req->header('X-test');
+			return @args == 2 && $args[0] == 2 && $args[1] == 5;
+		},
+		parameters => {
+			header => {
+				'X-Test' => {
+					type => 'array',
+					lax => !!1,
+					properties => {
+						type => 'integer',
+					},
+				},
+			},
+		},
+		response => {
+			type => 'boolean',
+		},
+	);
+
+	$self->add_endpoint(
 		[GET => '/cookie'] => sub {
 			my $self = shift;
 			return
@@ -107,8 +156,7 @@ sub api
 	$self->add_endpoint(
 		[POST => '/body'] => sub {
 			my $self = shift;
-			my $method = $self->request_format . '_param';
-			return $self->req->$method('test') == 25;
+			return $self->request_body->{'test'} == 25;
 		},
 		request => {
 			type => 'object',

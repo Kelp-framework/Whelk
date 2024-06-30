@@ -8,7 +8,6 @@ attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
 attr -route => sub { croak 'route is required in endpoint' };
 attr -code => sub { croak 'code is required in endpoint' };
 attr -path => \&_build_path;
-attr -request_format => undef;
 attr -request_schema => undef;
 attr -response_format => sub { croak 'response_format is required in endpoint' };
 attr -response_schema => sub { croak 'response_schema is required in endpoint' };
@@ -58,6 +57,14 @@ sub _build_path
 	$path =~ s/\0//g;
 
 	return $path;
+}
+
+sub wrap
+{
+	my ($self, $controller) = @_;
+
+	$self->route->dest->[0] //= ref $controller;    # make sure plain subs work
+	$self->route->dest->[1] = $controller->wrapper->wrap($self);
 }
 
 1;

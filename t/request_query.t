@@ -17,11 +17,11 @@ my $t = Kelp::Test->new(app => $app);
 
 $t->request(GET '/query')
 	->code_is(400)
-	->json_cmp({error => re(qr{Query parameters .+->defined})});
+	->json_cmp({error => re(qr{Query parameters .+->required})});
 
 $t->request(GET '/query?test1=25')
 	->code_is(400)
-	->json_cmp({error => re(qr{Query parameters .+\[test2\]->defined})});
+	->json_cmp({error => re(qr{Query parameters .+\[test2\]->required})});
 
 $t->request(GET '/query?test1=25.5&test2=')
 	->code_is(400)
@@ -29,6 +29,12 @@ $t->request(GET '/query?test1=25.5&test2=')
 
 $t->request(GET '/query?test1=25&test2=')
 	->code_is(200)
+	->header_is(X_Default => 'a default')
+	->json_cmp(JSON::PP::false);
+
+$t->request(GET '/query?test1=25&test2=&def=test')
+	->code_is(200)
+	->header_is(X_Default => 'test')
 	->json_cmp(JSON::PP::false);
 
 $t->request(GET '/query?test1=24&test2=1')

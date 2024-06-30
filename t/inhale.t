@@ -117,6 +117,25 @@ subtest 'should inhale typed array' => sub {
 	is $schema->inhale([qw(str1 str2 str3)]), undef, 'inhaled three strings ok';
 };
 
+subtest 'should inhale lax array' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'array',
+			lax => !!1,
+			properties => {
+				type => 'integer',
+			},
+		}
+	);
+
+	is $schema->inhale(undef), 'array[0]->defined', 'inhaled undef ok';
+	is $schema->inhale('no array'), 'array[0]->number', 'inhaled string ok';
+	is $schema->inhale(1), undef, 'inhaled int ok';
+	is $schema->inhale([]), undef, 'inhaled empty array ok';
+	is $schema->inhale([1]), undef, 'inhaled int in array ok';
+	is $schema->inhale([1, 2]), undef, 'inhaled two ints in array ok';
+};
+
 subtest 'should inhale object' => sub {
 	my $schema = Whelk::Schema->build(
 		{
@@ -156,9 +175,9 @@ subtest 'should inhale typed object' => sub {
 	);
 
 	is $schema->inhale('not an object'), 'object', 'inhaled string ok';
-	is $schema->inhale({}), 'object[bool]->defined', 'inhaled empty object ok';
+	is $schema->inhale({}), 'object[bool]->required', 'inhaled empty object ok';
 	is $schema->inhale({bool => 0}), undef, 'inhaled bool ok';
-	is $schema->inhale({int => -5}), 'object[bool]->defined', 'inhaled int ok';
+	is $schema->inhale({int => -5}), 'object[bool]->required', 'inhaled int ok';
 	is $schema->inhale({bool => {}, int => -5}), 'object[bool]->boolean', 'inhaled bool int ok';
 	is $schema->inhale({bool => JSON::PP::false, int => 5.5}), 'object[int]->integer', 'inhaled bool int 2 ok';
 	is $schema->inhale({bool => 1, obj => {nested => 1}}), 'object[obj]->object[nested]->null',

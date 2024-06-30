@@ -40,6 +40,7 @@ sub build_response_schemas
 				properties => {
 					success => {
 						type => 'boolean',
+						default => !!1,
 					},
 					data => [$schema, required => !!1],
 				},
@@ -53,6 +54,7 @@ sub build_response_schemas
 			properties => {
 				success => {
 					type => 'boolean',
+					default => !!0,
 				},
 				error => {
 					type => 'string',
