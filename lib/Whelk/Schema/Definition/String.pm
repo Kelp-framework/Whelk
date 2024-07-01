@@ -14,8 +14,8 @@ sub openapi_dump
 		$res->{description} = $self->description;
 	}
 
-	if (defined $self->default) {
-		$res->{default} = $self->default;
+	if ($self->has_default) {
+		$res->{default} = $self->exhale;
 	}
 
 	if (defined $self->example) {
