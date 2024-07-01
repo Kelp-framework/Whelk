@@ -21,7 +21,7 @@ attr data => sub {
 
 				YAML => {
 					kelp_extensions => 1,
-					boolean => 'JSON::PP,perl',
+					boolean => 'perl,JSON::PP',
 				},
 			},
 
