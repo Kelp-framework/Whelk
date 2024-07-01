@@ -53,7 +53,7 @@ sub _dump_parameters
 			name => $key,
 			in => $hints{parameters},
 			($item->description ? (description => $item->description) : ()),
-			required => $item->required,
+			required => $self->_bool($item->required),
 			schema => $item->openapi_schema($openapi_obj),
 		};
 	}
