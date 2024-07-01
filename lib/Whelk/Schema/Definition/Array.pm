@@ -5,6 +5,22 @@ use Kelp::Base 'Whelk::Schema::Definition';
 attr properties => undef;
 attr lax => !!0;
 
+sub openapi_dump
+{
+	my ($self, $openapi_obj, %hints) = @_;
+
+	my $res = {
+		type => 'array',
+		items => $self->properties->openapi_schema($openapi_obj),
+	};
+
+	if (defined $self->description) {
+		$res->{description} = $self->description;
+	}
+
+	return $res;
+}
+
 sub _resolve
 {
 	my ($self) = @_;

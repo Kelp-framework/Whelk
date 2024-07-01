@@ -5,12 +5,14 @@ use Carp;
 use Kelp::Util;
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
+use JSON::PP;
 
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
 
 attr name => undef;
 attr required => !!1;
+attr description => undef;
 
 sub create
 {
@@ -32,6 +34,11 @@ sub new
 
 	$self->_resolve;
 	return $self;
+}
+
+sub _bool
+{
+	return pop() ? JSON::PP::true : JSON::PP::false;
 }
 
 sub _resolve { }
@@ -108,6 +115,26 @@ sub inhale_or_error
 	}
 
 	return undef;
+}
+
+sub openapi_schema
+{
+	my ($self, $openapi_obj, %hints) = @_;
+
+	if ($self->name && !$hints{full}) {
+		return {
+			'$ref' => $openapi_obj->location_for_schema($self->name),
+		};
+	}
+	else {
+		return $self->openapi_dump($openapi_obj, %hints);
+	}
+}
+
+sub openapi_dump
+{
+	my ($self) = @_;
+	...;
 }
 
 sub exhale

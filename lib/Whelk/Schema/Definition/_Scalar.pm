@@ -4,6 +4,7 @@ use Kelp::Base 'Whelk::Schema::Definition';
 
 attr required => sub { !defined $_[0]->default };
 attr default => undef;
+attr example => undef;
 
 sub has_default
 {

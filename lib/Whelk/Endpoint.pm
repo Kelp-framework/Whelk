@@ -5,9 +5,13 @@ use Carp;
 use Whelk::Schema;
 
 attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
+attr -summary => undef;
+attr -description => undef;
+attr -resource => sub { croak 'resource is required in endpoint' };
 attr -route => sub { croak 'route is required in endpoint' };
 attr -code => sub { croak 'code is required in endpoint' };
 attr -path => \&_build_path;
+attr -request_formats => sub { [] };
 attr -request_schema => undef;
 attr -response_format => sub { croak 'response_format is required in endpoint' };
 attr -response_schema => sub { croak 'response_schema is required in endpoint' };

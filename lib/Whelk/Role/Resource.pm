@@ -9,6 +9,7 @@ use Whelk::Endpoint;
 use Whelk::Endpoint::Parameters;
 use Whelk::Schema;
 
+attr resource => undef;
 attr base_route => undef;
 attr wrapper => undef;
 attr response_format => sub { shift->whelk->default_format };
@@ -72,9 +73,11 @@ sub add_endpoint
 
 	$pattern = $self->_whelk_adjust_pattern($pattern);
 	$args->{to} = $self->_whelk_adjust_to($args->{to});
+	$args->{method} //= 'GET';
 	my $route = $self->add_route($pattern, $args)->parent;
 
 	my $endpoint = Whelk::Endpoint->new(
+		resource => $self->resource,
 		route => $route,
 		code => $route->dest->[1],
 		request_formats => [values %{$self->whelk->formatter->supported_formats}],
@@ -82,6 +85,8 @@ sub add_endpoint
 		request_schema => Whelk::Schema->build_if_defined($meta{request}),
 		response_schema => Whelk::Schema->build_if_defined($meta{response}),
 		parameters => Whelk::Endpoint::Parameters->new(%{$meta{parameters} // {}}),
+		summary => $meta{summary},
+		description => $meta{description},
 	);
 
 	$endpoint->wrap($self);

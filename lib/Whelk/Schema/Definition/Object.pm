@@ -5,6 +5,62 @@ use Kelp::Base 'Whelk::Schema::Definition';
 attr properties => undef;
 attr strict => !!0;
 
+sub openapi_dump
+{
+	my ($self, $openapi_obj, %hints) = @_;
+
+	if ($hints{parameters}) {
+		return $self->_dump_parameters($openapi_obj, %hints);
+	}
+
+	my $res = {
+		type => 'object',
+	};
+
+	my @required;
+	my %items;
+	my $properties = $self->properties;
+	foreach my $key (sort keys %{$properties}) {
+		$items{$key} = $properties->{$key}->openapi_schema($openapi_obj);
+		push @required, $key
+			if $properties->{$key}->required;
+	}
+
+	if (%items) {
+		$res->{properties} = \%items;
+		$res->{required} = \@required
+			if @required;
+	}
+
+	if (defined $self->description) {
+		$res->{description} = $self->description;
+	}
+
+	return $res;
+}
+
+sub _dump_parameters
+{
+	my ($self, $openapi_obj, %hints) = @_;
+
+	# dump an object schema which was used for parameters. This is not actually
+	# a schema but an openapi parameters object
+	my @res;
+	my $properties = $self->properties;
+	foreach my $key (sort keys %{$properties}) {
+		my $item = $properties->{$key};
+		push @res, {
+			name => $key,
+			in => $hints{parameters},
+			($item->description ? (description => $item->description) : ()),
+			required => $item->required,
+			schema => $item->openapi_schema($openapi_obj),
+		};
+	}
+
+	return \@res;
+}
+
 sub _resolve
 {
 	my ($self) = @_;

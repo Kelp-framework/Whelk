@@ -4,6 +4,7 @@ use Kelp::Base 'Kelp::Module';
 use Kelp::Util;
 use Carp;
 use Whelk::Schema;
+use Whelk::ResourceMeta;
 
 attr formatter => undef;
 attr verbose => !!1;
@@ -64,7 +65,8 @@ sub _initialize_resources
 	carp 'No resources for Whelk, you should define some in config'
 		unless keys %resources;
 
-	foreach my $resource (keys %resources) {
+	# sort to have deterministic order of endpoints
+	foreach my $resource (sort keys %resources) {
 		my $controller = $app->context->controller($resource);
 		my $config = $resources{$resource};
 
@@ -85,6 +87,7 @@ sub _initialize_resources
 		$wrapper_class = Kelp::Util::camelize($wrapper_class, 'Whelk::Wrapper', 1);
 		$controller->wrapper(Kelp::Util::load_package($wrapper_class)->new(resource => $controller));
 
+		$controller->resource(Whelk::ResourceMeta->new(class => $resource, config => $config));
 		$controller->base_route($config->{path});
 		$controller->build;
 	}
@@ -95,36 +98,35 @@ sub _install_openapi
 	my ($self, %args) = @_;
 	my $app = $self->app;
 
-	my $endpoint = $args{openapi};
-	return unless $endpoint;
+	my $args = $args{openapi};
+	return unless $args;
 
-	croak 'openapi_path requires path and format'
-		unless $endpoint->{path} && $endpoint->{format};
+	croak 'openapi requires path'
+		unless $args->{path};
 
-	my $class = $endpoint->{class} // 'Whelk::OpenAPI';
+	$args->{format} //= 'json';
+	my $format = $self->formatter->supported_formats->{$args->{format}};
+	croak "unsupported openapi format $args->{format}"
+		unless defined $format;
+
+	my $class = $args->{class} // 'Whelk::OpenAPI';
 	$self->openapi_generator(Kelp::Util::load_package($class)->new);
 
 	$self->openapi_generator->parse(
-		paths => $self->endpoints,
+		app => $app,
+		info => $args->{info},
+		endpoints => $self->endpoints,
 		schemas => Whelk::Schema->all_schemas,
 	);
 
 	$app->add_route(
-		[GET => $endpoint->{path}] => sub {
+		[GET => $args->{path}] => sub {
 			my ($app) = @_;
 
-			my $format = $endpoint->{format};
-			$app->res->$format;
-			return $self->generate_openapi;
+			$app->res->set_content_type($format, $app->res->charset // $app->charset);
+			return $self->openapi_generator->generate();
 		}
 	);
-}
-
-sub generate_openapi
-{
-	my ($self) = @_;
-
-	return $self->openapi_generator->generate;
 }
 
 1;

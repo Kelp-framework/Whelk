@@ -109,6 +109,22 @@ subtest 'should be able to create a new schema by extending' => sub {
 	isnt $to_extend, $extended, 'schema looks extended ok';
 	is $to_extend->name, 'base', 'base name ok';
 	is $extended->name, 'extension', 'extension name ok';
+
+	my $extended_again = Whelk::Schema->get_by_name('extension');
+	is $extended_again->name, $extended->name, 'get_by_name ok';
+};
+
+subtest 'build_if_defined should handle building ref schemas' => sub {
+	my $to_extend = Whelk::Schema->build(
+		first => {
+			type => 'integer',
+		}
+	);
+
+	my $extended = Whelk::Schema->build_if_defined(\'first');
+
+	is $to_extend->name, 'first', 'name ok';
+	is $extended, $to_extend, 'ref ok';
 };
 
 done_testing;

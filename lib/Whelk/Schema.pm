@@ -31,13 +31,15 @@ sub build
 
 	my ($name, $args) = @input;
 	my $self = Whelk::Schema::Definition->create($args);
-	$self->name($name);
 
-	croak "trying to reuse schema name " . $self->name
-		if $self->name && $registered{$self->name};
+	if ($name) {
+		$self->name($name);
 
-	$registered{$self->name} = $self
-		if $self->name;
+		croak "trying to reuse schema name " . $self->name
+			if $registered{$self->name};
+
+		$registered{$self->name} = $self;
+	}
 
 	return $self;
 }
