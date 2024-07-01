@@ -91,7 +91,7 @@ sub _initialize_resources
 
 		$controller->resource(Whelk::ResourceMeta->new(class => $resource, config => $config));
 		$controller->base_route($config->{path});
-		$controller->build;
+		$controller->api;
 	}
 }
 

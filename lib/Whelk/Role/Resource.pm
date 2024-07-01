@@ -14,6 +14,8 @@ attr base_route => undef;
 attr wrapper => undef;
 attr response_format => sub { shift->whelk->default_format };
 
+requires 'api';
+
 sub _whelk_adjust_pattern
 {
 	my ($self, $pattern) = @_;
@@ -94,14 +96,6 @@ sub add_endpoint
 	push @{$self->whelk->endpoints}, $endpoint;
 	return $self;
 }
-
-after 'build' => sub {
-	my ($self) = @_;
-
-	$self->api;
-};
-
-sub api { }
 
 1;
 
