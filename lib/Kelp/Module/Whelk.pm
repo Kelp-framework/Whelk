@@ -106,7 +106,8 @@ sub _install_openapi
 	croak 'openapi requires path'
 		unless $args->{path};
 
-	my $format = $self->formatter->supported_format($self->app, $args->{format} // 'json');
+	my $format = $args->{format} // $self->default_format;
+	my $full_format = $self->formatter->supported_format($self->app, $format);
 	my $class = $args->{class} // 'Whelk::OpenAPI';
 	$self->openapi_generator(Kelp::Util::load_package($class)->new);
 
@@ -121,8 +122,9 @@ sub _install_openapi
 		[GET => $args->{path}] => sub {
 			my ($app) = @_;
 
-			$app->res->set_content_type($format, $app->res->charset // $app->charset);
-			return $self->openapi_generator->generate();
+			$app->res->set_content_type($full_format, $app->res->charset // $app->charset);
+			my $generated = $self->openapi_generator->generate();
+			return $app->get_encoder($format => 'openapi')->encode($generated);
 		}
 	);
 }

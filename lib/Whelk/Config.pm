@@ -24,6 +24,15 @@ attr data => sub {
 					boolean => 'JSON::PP,perl',
 				},
 			},
+
+			encoders => {
+				json => {
+					openapi => {
+						pretty => 1,
+						canonical => 1,
+					},
+				},
+			},
 		}
 	);
 };
