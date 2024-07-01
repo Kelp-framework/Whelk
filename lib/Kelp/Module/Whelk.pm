@@ -31,7 +31,9 @@ sub _load_config
 	my $app = $self->app;
 
 	$self->formatter(
-		Kelp::Util::load_package($args->{formatter_class} // 'Whelk::Formatter')->new
+		Kelp::Util::load_package($args->{formatter_class} // 'Whelk::Formatter')->new(
+			app => $self->app,
+		)
 	);
 
 	$self->verbose($args->{verbose})
@@ -104,11 +106,7 @@ sub _install_openapi
 	croak 'openapi requires path'
 		unless $args->{path};
 
-	$args->{format} //= 'json';
-	my $format = $self->formatter->supported_formats->{$args->{format}};
-	croak "unsupported openapi format $args->{format}"
-		unless defined $format;
-
+	my $format = $self->formatter->supported_format($self->app, $args->{format} // 'json');
 	my $class = $args->{class} // 'Whelk::OpenAPI';
 	$self->openapi_generator(Kelp::Util::load_package($class)->new);
 

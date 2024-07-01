@@ -7,7 +7,7 @@ attr data => sub {
 	return $self->merge(
 		$self->SUPER::data,
 		{
-			modules => [qw(Whelk JSON YAML)],
+			modules => [qw(JSON YAML Whelk)],
 			modules_init => {
 				Routes => {
 					base => 'Whelk::Resource',
