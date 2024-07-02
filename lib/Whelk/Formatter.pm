@@ -62,13 +62,22 @@ sub get_request_body
 		undef;
 }
 
-sub set_content_type
+sub format_response
 {
-	my ($self, $app) = @_;
+	my ($self, $app, $data, $special_encoder) = @_;
 	my $res = $app->res;
+	my $ct = $res->content_type;
 
+	# ensure proper content-type
 	$res->set_content_type($self->full_response_format, $res->charset // $app->charset)
-		unless $res->content_type;
+		if !$ct;
+
+	# only encode manually if we have a special encoder requested
+	return $app->get_encoder($self->response_format => $special_encoder)->encode($data)
+		if $special_encoder && ref $data && (!$ct || $ct eq $self->full_response_format);
+
+	# otherwise, let Kelp try to handle this
+	return $data;
 }
 
 sub new

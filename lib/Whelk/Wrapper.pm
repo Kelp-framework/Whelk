@@ -173,9 +173,6 @@ sub prepare_response
 		}
 	}
 
-	# set content type header
-	$endpoint->formatter->set_content_type($app);
-
 	return $self->exhale_response($app, $endpoint, $data);
 }
 
@@ -220,11 +217,13 @@ sub wrap
 	return sub {
 		my $app = shift;
 
-		return $self->prepare_response(
+		my $prepared = $self->prepare_response(
 			$app,
 			$endpoint,
 			$self->execute($app, $endpoint, @_),
 		);
+
+		return $endpoint->formatter->format_response($app, $prepared);
 	};
 }
 

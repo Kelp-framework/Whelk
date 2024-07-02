@@ -139,8 +139,7 @@ sub _install_openapi
 
 			my $generated = $self->openapi_generator->generate();
 
-			$formatter->set_content_type($app);
-			return $app->get_encoder($formatter->response_format => 'openapi')->encode($generated);
+			return $formatter->format_response($app, $generated, 'openapi');
 		}
 	);
 }
