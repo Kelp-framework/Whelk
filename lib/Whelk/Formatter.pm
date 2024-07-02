@@ -4,21 +4,15 @@ use Kelp::Base;
 use Carp;
 use Whelk::Exception;
 
-sub supported_format
-{
-	my ($self, $app, $format) = @_;
-	my $formats = $self->supported_formats($app);
+attr response_format => sub { ... };
+attr full_response_format => sub { $_[0]->supported_format($_[0]->response_format) };
+attr supported_formats => sub { {} };
 
-	croak "Format $format is not supported"
-		unless exists $formats->{$format};
-
-	return $formats->{$format};
-}
-
-sub supported_formats
+sub load_formats
 {
 	my ($self, $app) = @_;
 	my $app_encoders = $app->encoder_modules;
+
 	my %supported = (
 		json => 'application/json',
 		yaml => 'text/yaml',
@@ -29,13 +23,25 @@ sub supported_formats
 			if !exists $app_encoders->{$encoder};
 	}
 
-	return \%supported;
+	$self->supported_formats(\%supported);
+	return $self;
+}
+
+sub supported_format
+{
+	my ($self, $format) = @_;
+	my $formats = $self->supported_formats;
+
+	croak "Format $format is not supported"
+		unless exists $formats->{$format};
+
+	return $formats->{$format};
 }
 
 sub match_format
 {
 	my ($self, $app) = @_;
-	my $formats = $self->supported_formats($app);
+	my $formats = $self->supported_formats;
 
 	foreach my $format (keys %$formats) {
 		return $format
@@ -54,6 +60,29 @@ sub get_request_body
 		$format eq 'json' ? $app->req->json_content :
 		$format eq 'yaml' ? $app->req->yaml_content :
 		undef;
+}
+
+sub set_content_type
+{
+	my ($self, $app) = @_;
+	my $res = $app->res;
+
+	$res->set_content_type($self->full_response_format, $res->charset // $app->charset)
+		unless $res->content_type;
+}
+
+sub new
+{
+	my ($class, %args) = @_;
+
+	my $app = delete $args{app};
+	croak 'app is required in new'
+		if !$app;
+
+	my $self = $class->SUPER::new(%args);
+	$self->load_formats($app);
+
+	return $self;
 }
 
 1;

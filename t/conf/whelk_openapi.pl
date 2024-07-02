@@ -1,5 +1,5 @@
 {
-	api_default_wrapper => 'WithStatus',
+	api_wrapper => 'WithStatus',
 	api_resources => {
 		'ShowcaseOpenAPI' => {
 			path => '/api',
@@ -16,7 +16,7 @@
 
 	api_openapi => {
 		path => '/',
-		format => 'yaml',
+		formatter => 'YAML',
 		info => {
 			title => 'OpenApi/Swagger integration for Whelk',
 			description =>

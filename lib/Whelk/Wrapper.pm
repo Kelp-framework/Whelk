@@ -66,7 +66,7 @@ sub inhale_request
 
 	if ($endpoint->request_schema) {
 		$app->stash->{request} = $endpoint->request_schema->inhale_exhale(
-			$app->whelk->formatter->get_request_body($app),
+			$endpoint->formatter->get_request_body($app),
 			sub {
 				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");
 			}
@@ -174,8 +174,7 @@ sub prepare_response
 	}
 
 	# set content type header
-	$res->set_content_type($endpoint->response_format, $res->charset // $app->charset)
-		unless $res->content_type;
+	$endpoint->formatter->set_content_type($app);
 
 	return $self->exhale_response($app, $endpoint, $data);
 }

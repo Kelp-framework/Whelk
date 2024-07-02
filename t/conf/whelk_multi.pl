@@ -1,8 +1,11 @@
 {
-	api_default_wrapper => 'WithStatus',
+	api_wrapper => 'WithStatus',
 	api_resources => {
 		'Test' => '/test',
-		'Test::Deep' => '/deep',
+		'Test::Deep' => {
+			path => '/deep',
+			formatter => 'YAML',
+		},
 	},
 }
 

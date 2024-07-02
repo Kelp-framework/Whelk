@@ -51,7 +51,7 @@ sub _build_path
 			$responses{$code} = {
 				description => $schema->description // $self->default_res_desc($code),
 				content => {
-					$endpoint->response_format => {
+					$endpoint->formatter->full_response_format => {
 						schema => $schema->openapi_schema($self),
 					},
 				},
@@ -61,7 +61,7 @@ sub _build_path
 
 	# build requests
 	if (my $schema = $endpoint->request_schema) {
-		foreach my $format (@{$endpoint->request_formats}) {
+		foreach my $format (values %{$endpoint->formatter->supported_formats}) {
 			$requests{content}{$format}{schema} = $schema->openapi_schema($self);
 		}
 	}

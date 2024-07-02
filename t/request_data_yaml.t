@@ -7,7 +7,7 @@ use JSON::PP;
 
 use lib 't/lib';
 
-my $app = Whelk->new(mode => 'requests', __config => {api_default_format => 'yaml'});
+my $app = Whelk->new(mode => 'requests', __config => {api_formatter => 'YAML'});
 my $t = Kelp::Test->new(app => $app);
 
 ################################################################################

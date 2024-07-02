@@ -11,9 +11,8 @@ attr -resource => sub { croak 'resource is required in endpoint' };
 attr -route => sub { croak 'route is required in endpoint' };
 attr -code => sub { croak 'code is required in endpoint' };
 attr -path => \&_build_path;
-attr -request_formats => sub { [] };
+attr -formatter => sub { croak 'formatter is required in endpoint' };
 attr -request_schema => undef;
-attr -response_format => sub { croak 'response_format is required in endpoint' };
 attr -response_schema => sub { croak 'response_schema is required in endpoint' };
 attr -parameters => sub { croak 'parameters are required in endpoint' };
 
@@ -68,7 +67,7 @@ sub wrap
 	my ($self, $controller) = @_;
 
 	$self->route->dest->[0] //= ref $controller;    # make sure plain subs work
-	$self->route->dest->[1] = $controller->wrapper->wrap($self);
+	$self->route->dest->[1] = $controller->_whelk_config('wrapper')->wrap($self);
 }
 
 1;

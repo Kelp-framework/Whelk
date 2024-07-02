@@ -6,11 +6,9 @@ use Carp;
 use Whelk::Schema;
 use Whelk::ResourceMeta;
 
-attr formatter => undef;
-attr verbose => !!1;
 attr inhale_response => !!1;
-attr default_format => 'json';
 attr openapi_generator => undef;
+attr resources => sub { {} };
 attr endpoints => sub { [] };
 
 sub build
@@ -25,22 +23,18 @@ sub build
 	$self->_install_openapi(%args);
 }
 
+sub _load_package
+{
+	my ($self, $package, $base) = @_;
+
+	my $class = Kelp::Util::camelize($package, $base, 1);
+	return Kelp::Util::load_package($class);
+}
+
 sub _load_config
 {
 	my ($self, $args) = @_;
 	my $app = $self->app;
-
-	$self->formatter(
-		Kelp::Util::load_package($args->{formatter_class} // 'Whelk::Formatter')->new(
-			app => $self->app,
-		)
-	);
-
-	$self->verbose($args->{verbose})
-		if exists $args->{verbose};
-
-	$self->inhale_response($args->{inhale_response})
-		if exists $args->{inhale_response};
 
 	# if this is Whelk or based on Whelk, use the main config
 	if ($app->isa('Whelk')) {
@@ -48,13 +42,17 @@ sub _load_config
 			for qw(
 			resources
 			openapi
-			default_wrapper
-			default_format
+			wrapper
+			formatter
+			inhale_response
 			);
 	}
 
-	$self->default_format($args->{default_format})
-		if defined $args->{default_format};
+	$args->{wrapper} //= 'Simple';
+	$args->{formatter} //= 'JSON';
+
+	$self->inhale_response($args->{inhale_response})
+		if defined $args->{inhale_response};
 }
 
 sub _initialize_resources
@@ -62,7 +60,6 @@ sub _initialize_resources
 	my ($self, %args) = @_;
 	my $app = $self->app;
 
-	$args{default_wrapper} //= 'Simple';
 	my %resources = %{$args{resources} // {}};
 	carp 'No resources for Whelk, you should define some in config'
 		unless keys %resources;
@@ -85,12 +82,29 @@ sub _initialize_resources
 		croak "Wrong path for $resource"
 			unless $config->{path} =~ m{^/};
 
-		my $wrapper_class = $config->{wrapper} // $args{default_wrapper};
-		$wrapper_class = Kelp::Util::camelize($wrapper_class, 'Whelk::Wrapper', 1);
-		$controller->wrapper(Kelp::Util::load_package($wrapper_class)->new(resource => $controller));
+		$self->resources->{ref $controller} = {
+			base_route => $config->{path},
+			wrapper => $self
+				->_load_package(
+					$config->{wrapper} // $args{wrapper},
+					'Whelk::Wrapper',
+				)
+				->new,
 
-		$controller->resource(Whelk::ResourceMeta->new(class => $resource, config => $config));
-		$controller->base_route($config->{path});
+			formatter => $self
+				->_load_package(
+					$config->{formatter} // $args{formatter},
+					'Whelk::Formatter',
+				)
+				->new(app => $self->app),
+
+			resource => Whelk::ResourceMeta
+				->new(
+					class => $resource,
+					config => $config,
+				),
+		};
+
 		$controller->api;
 	}
 }
@@ -100,31 +114,33 @@ sub _install_openapi
 	my ($self, %args) = @_;
 	my $app = $self->app;
 
-	my $args = $args{openapi};
-	return unless $args;
+	my $config = $args{openapi};
+	return unless $config;
 
 	croak 'openapi requires path'
-		unless $args->{path};
+		unless $config->{path};
 
-	my $format = $args->{format} // $self->default_format;
-	my $full_format = $self->formatter->supported_format($self->app, $format);
-	my $class = $args->{class} // 'Whelk::OpenAPI';
-	$self->openapi_generator(Kelp::Util::load_package($class)->new);
+	my $openapi_class = $self->_load_package($config->{class} // 'Whelk::OpenAPI');
+	$self->openapi_generator($openapi_class->new);
+
+	my $formatter_class = $self->_load_package($config->{formatter} // $args{formatter}, 'Whelk::Formatter');
+	my $formatter = $formatter_class->new(app => $self->app);
 
 	$self->openapi_generator->parse(
 		app => $app,
-		info => $args->{info},
+		info => $config->{info},
 		endpoints => $self->endpoints,
 		schemas => Whelk::Schema->all_schemas,
 	);
 
 	$app->add_route(
-		[GET => $args->{path}] => sub {
+		[GET => $config->{path}] => sub {
 			my ($app) = @_;
 
-			$app->res->set_content_type($full_format, $app->res->charset // $app->charset);
 			my $generated = $self->openapi_generator->generate();
-			return $app->get_encoder($format => 'openapi')->encode($generated);
+
+			$formatter->set_content_type($app);
+			return $app->get_encoder($formatter->response_format => 'openapi')->encode($generated);
 		}
 	);
 }
