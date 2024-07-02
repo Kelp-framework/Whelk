@@ -4,6 +4,7 @@ use Kelp::Base;
 use List::Util qw(uniq);
 
 attr info => sub { {} };
+attr extra => sub { {} };
 attr tags => sub { [] };
 attr paths => sub { {} };
 attr schemas => sub { {} };
@@ -91,6 +92,8 @@ sub parse
 	my ($self, %data) = @_;
 
 	$self->info($data{info} // {});
+	$self->extra($data{extra} // {});
+
 	$self->servers(
 		[
 			{
@@ -137,6 +140,10 @@ sub generate
 	my ($self) = @_;
 
 	my %generated = (
+
+		# extra at the start, to make sure it's not overshadowing keys
+		%{$self->extra},
+
 		openapi => '3.0.3',
 		info => $self->info,
 		servers => $self->servers,

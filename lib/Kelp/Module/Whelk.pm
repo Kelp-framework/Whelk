@@ -129,6 +129,7 @@ sub _install_openapi
 	$self->openapi_generator->parse(
 		app => $app,
 		info => $config->{info},
+		extra => $config->{extra},
 		endpoints => $self->endpoints,
 		schemas => Whelk::Schema->all_schemas,
 	);
