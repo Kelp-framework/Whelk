@@ -78,7 +78,7 @@ sub api
 				test => {
 					type => 'array',
 					lax => !!1,
-					properties => {
+					items => {
 						type => 'integer',
 					},
 				},
@@ -122,7 +122,7 @@ sub api
 				'X-Test' => {
 					type => 'array',
 					lax => !!1,
-					properties => {
+					items => {
 						type => 'integer',
 					},
 				},

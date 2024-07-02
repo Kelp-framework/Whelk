@@ -101,7 +101,7 @@ subtest 'should inhale typed array' => sub {
 	my $schema = Whelk::Schema->build(
 		{
 			type => 'array',
-			properties => {
+			items => {
 				type => 'string',
 			},
 		}
@@ -122,7 +122,7 @@ subtest 'should inhale lax array' => sub {
 		{
 			type => 'array',
 			lax => !!1,
-			properties => {
+			items => {
 				type => 'integer',
 			},
 		}

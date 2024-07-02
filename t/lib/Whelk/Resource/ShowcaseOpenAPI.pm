@@ -39,7 +39,7 @@ sub api
 		},
 		response => {
 			type => 'array',
-			properties => \'some_entity',
+			items => \'some_entity',
 		},
 	);
 }

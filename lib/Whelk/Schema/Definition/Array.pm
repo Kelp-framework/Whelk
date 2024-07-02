@@ -2,7 +2,7 @@ package Whelk::Schema::Definition::Array;
 
 use Kelp::Base 'Whelk::Schema::Definition';
 
-attr properties => undef;
+attr items => undef;
 attr lax => !!0;
 
 sub openapi_dump
@@ -11,7 +11,7 @@ sub openapi_dump
 
 	my $res = {
 		type => 'array',
-		items => $self->properties->openapi_schema($openapi_obj),
+		items => $self->items->openapi_schema($openapi_obj),
 	};
 
 	if (defined $self->description) {
@@ -25,8 +25,8 @@ sub _resolve
 {
 	my ($self) = @_;
 
-	$self->properties($self->_build($self->properties))
-		if $self->properties;
+	$self->items($self->_build($self->items))
+		if $self->items;
 }
 
 sub inhale
@@ -34,7 +34,7 @@ sub inhale
 	my ($self, $value) = @_;
 
 	if (ref $value eq 'ARRAY') {
-		my $type = $self->properties;
+		my $type = $self->items;
 		return undef unless $type;
 
 		foreach my $index (keys @$value) {
@@ -45,7 +45,7 @@ sub inhale
 		return undef;
 	}
 	elsif ($self->lax) {
-		my $type = $self->properties;
+		my $type = $self->items;
 		return undef unless $type;
 
 		my $inhaled = $type->inhale($value);
@@ -65,7 +65,7 @@ sub exhale
 		$value = [$value];
 	}
 
-	my $type = $self->properties;
+	my $type = $self->items;
 	return $value unless $type;
 
 	@$value = map { $type->exhale($_) } @$value;

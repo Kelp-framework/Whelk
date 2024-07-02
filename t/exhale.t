@@ -86,7 +86,7 @@ subtest 'should exhale typed array' => sub {
 	my $schema = Whelk::Schema->build(
 		{
 			type => 'array',
-			properties => {
+			items => {
 				type => 'string',
 			},
 		}
