@@ -13,7 +13,7 @@ Whelk::Manual - Reference to APIs with Whelk
 	##############################
 
 	{
-		api_resources => {
+		resources => {
 			'MyApi' => {
 				path => '/',
 				name => 'Demo',
@@ -21,7 +21,7 @@ Whelk::Manual - Reference to APIs with Whelk
 			},
 		},
 
-		api_openapi => {
+		openapi => {
 			path => '/openapi.yaml',
 			format => 'yaml',
 			info => {
@@ -203,21 +203,21 @@ C<whelk_deployment.pl>.
 Since Whelk is a Kelp app, you can use all the regular Kelp configuration fields.
 In addition, you can define these Whelk-specific fields:
 
-=head4 api_formatter
+=head4 formatter
 
 A default class for request / response formatters. It will be prefixed with
 C<Whelk::Formatter>. It has to start with C<+> to avoid prefixing. By default,
 value C<JSON> is used, which constructs L<Whelk::Formatter::JSON>. Can be
 configured to C<YAML> available in Whelk's core, or any custom formatter.
 
-=head4 api_wrapper
+=head4 wrapper
 
 A default class for endpoint formatters. It will be prefixed with
 C<Whelk::Wrapper>. It has to start with C<+> to avoid prefixing. By default,
 value C<Simple> is used, which constructs L<Whelk::Wrapper::Simple>. Can be
 configured to C<WithStatus> available in Whelk's core, or any custom wrapper.
 
-=head4 api_resources
+=head4 resources
 
 A hash containing all the resources for this app.
 
@@ -234,11 +234,11 @@ B<Mandatory>. A base path under which each endpoint in this resource will be mou
 
 =item wrapper
 
-Same as L<api_wrapper>, but specialized for this resource only.
+Same as L<wrapper>, but specialized for this resource only.
 
 =item formatter
 
-Same as L<api_formatter>, but specialized for this resource only.
+Same as L<formatter>, but specialized for this resource only.
 
 =item description
 
@@ -248,7 +248,7 @@ A description used for the resource tag in OpenAPI.
 
 If the value is string, it is used as if it was passed as C<path>.
 
-=head4 api_openapi
+=head4 openapi
 
 A hash containing OpenAPI data, with the following keys:
 
@@ -260,7 +260,7 @@ B<Mandatory>. A path under which OpenAPI endpoint will be mounted.
 
 =item formatter
 
-Same as L<api_formatter>, but specialized for OpenAPI endpont only.
+Same as L<formatter>, but specialized for OpenAPI endpont only.
 
 =item class
 
@@ -280,7 +280,7 @@ take precedence over other keys.
 
 =back
 
-=head4 api_inhale_response
+=head4 inhale_response
 
 A boolean value - whether to I<inhale> (validate) response before serializing
 it. Default value is C<true>. It is strongly recommended that this stays
@@ -506,7 +506,7 @@ to keep them in C<Whelk::Resource> namespace, they will have to be specified
 with full class name and prefixed with C<+>:
 
 	{
-		api_resources => {
+		resources => {
 			'+Whelk::Resource::SomeResource' => '/some_resource',
 		}
 	}

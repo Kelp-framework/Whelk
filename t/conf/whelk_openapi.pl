@@ -1,6 +1,6 @@
 {
-	api_wrapper => 'WithStatus',
-	api_resources => {
+	wrapper => 'WithStatus',
+	resources => {
 		'ShowcaseOpenAPI' => {
 			path => '/api',
 			name => 'Whelk OpenAPI',
@@ -14,7 +14,7 @@
 		'Test' => '/t',
 	},
 
-	api_openapi => {
+	openapi => {
 		path => '/',
 		formatter => 'YAML',
 		info => {

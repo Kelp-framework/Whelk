@@ -44,7 +44,7 @@ sub _load_config
 
 	# if this is Whelk or based on Whelk, use the main config
 	if ($app->isa('Whelk')) {
-		$args->{$_} //= $app->config("api_$_")
+		$args->{$_} //= $app->config($_)
 			for qw(
 			resources
 			openapi

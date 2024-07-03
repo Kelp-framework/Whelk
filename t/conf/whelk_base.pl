@@ -1,6 +1,6 @@
 {
-	api_wrapper => 'WithStatus',
-	api_resources => {
+	wrapper => 'WithStatus',
+	resources => {
 		'Test' => '/test',
 	},
 }

@@ -1,5 +1,5 @@
 {
-    api_resources => {
+    resources => {
         '[% name %]' => {
             path => '/[% module_file %]',
             name => 'Whelk resource',
@@ -7,7 +7,7 @@
         },
     },
 
-    api_openapi => {
+    openapi => {
         path => '/openapi.json',
         info => {
             title => 'My Whelk API',
