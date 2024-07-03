@@ -565,16 +565,3 @@ L<Whelk::Manual::Kelp>
 
 L<Whelk::Schema>
 
-=head1 AUTHOR
-
-Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
-
-Consider supporting my effort: L<https://bbrtj.eu/support>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2024 by Bartosz Jarzyna
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
