@@ -10,14 +10,14 @@ attr -query => sub { {} };
 attr -header => sub { {} };
 attr -cookie => sub { {} };
 
-attr -path_schema => sub { $_[0]->build_schema($_[0]->path) };
-attr -query_schema => sub { $_[0]->build_schema($_[0]->query, default => 1, array => 1) };
+attr -path_schema => sub { $_[0]->build_schema($_[0]->path, required => 1) };
+attr -query_schema => sub { $_[0]->build_schema($_[0]->query, array => 1) };
 attr -header_schema => sub { $_[0]->build_schema($_[0]->header, array => 1) };
 attr -cookie_schema => sub { $_[0]->build_schema($_[0]->cookie) };
 
 sub build_schema
 {
-	my ($self, $hashref, %allow) = @_;
+	my ($self, $hashref, %hints) = @_;
 	return undef if !%$hashref;
 
 	my $built = Whelk::Schema->build(
@@ -34,14 +34,14 @@ sub build_schema
 
 		if ($is_array) {
 			croak 'Whelk only supports array types in header and query parameters'
-				unless $allow{array};
+				unless $hints{array};
 		}
 		elsif (!$is_scalar) {
 			croak 'Whelk only supports string, integer, number, boolean and array types in parameters';
 		}
 
-		croak 'Whelk only supports default values in query parameters'
-			if $is_scalar && defined $item->default && !$allow{default};
+		croak 'Whelk path parameters must be required'
+			if $hints{required} && !$item->required;
 	}
 
 	return $built;
