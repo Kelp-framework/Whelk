@@ -21,7 +21,7 @@ sub build
 	$self->register(whelk => $self);
 }
 
-sub init
+sub finalize
 {
 	my ($self) = @_;
 

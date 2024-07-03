@@ -10,7 +10,7 @@ sub build
 {
 	my ($self) = @_;
 
-	$self->whelk->init;
+	$self->whelk->finalize;
 }
 
 1;
