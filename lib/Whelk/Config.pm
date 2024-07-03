@@ -25,6 +25,8 @@ attr data => sub {
 				},
 			},
 
+			persistent_controllers => 1,
+
 			encoders => {
 				json => {
 					openapi => {
