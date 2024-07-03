@@ -127,8 +127,12 @@ sub _install_openapi
 	my $config = $args->{openapi};
 	return unless $config;
 
-	croak 'openapi requires path'
-		unless $config->{path};
+	$config = {
+		path => $config
+	} unless ref $config eq 'HASH';
+
+	croak "Wrong path for openapi"
+		unless $config->{path} =~ m{^/};
 
 	my $openapi_class = $self->_load_package($config->{class} // 'Whelk::OpenAPI');
 	$self->openapi_generator($openapi_class->new);

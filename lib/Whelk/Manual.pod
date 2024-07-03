@@ -250,7 +250,7 @@ If the value is string, it is used as if it was passed as C<path>.
 
 =head4 openapi
 
-A hash containing OpenAPI data, with the following keys:
+A string or hash containing OpenAPI data, with the following keys:
 
 =over
 
@@ -279,6 +279,8 @@ Any extra keys to be added to the root of the OpenAPI document. They will not
 take precedence over other keys.
 
 =back
+
+If the value is string, it is used as if it was passed as C<path>.
 
 =head4 inhale_response
 
