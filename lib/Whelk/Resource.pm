@@ -5,7 +5,7 @@ use Role::Tiny::With;
 
 with 'Whelk::Role::Resource';
 
-sub api { }
+sub api { ... }
 
 1;
 
