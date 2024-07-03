@@ -6,6 +6,7 @@ use Carp;
 use Whelk::Schema;
 use Whelk::ResourceMeta;
 
+attr config => undef;
 attr inhale_response => !!1;
 attr openapi_generator => undef;
 attr resources => sub { {} };
@@ -16,11 +17,16 @@ sub build
 	my ($self, %args) = @_;
 	$self->_load_config(\%args);
 
-	# register before initializing, so that controllers have acces to whelk
+	# register before loading, so that controllers have acces to whelk
 	$self->register(whelk => $self);
+}
 
-	$self->_initialize_resources(%args);
-	$self->_install_openapi(%args);
+sub init
+{
+	my ($self) = @_;
+
+	$self->_initialize_resources();
+	$self->_install_openapi();
 }
 
 sub _load_package
@@ -53,14 +59,17 @@ sub _load_config
 
 	$self->inhale_response($args->{inhale_response})
 		if defined $args->{inhale_response};
+
+	$self->config($args);
 }
 
 sub _initialize_resources
 {
-	my ($self, %args) = @_;
+	my ($self) = @_;
 	my $app = $self->app;
+	my $args = $self->config;
 
-	my %resources = %{$args{resources} // {}};
+	my %resources = %{$args->{resources} // {}};
 	carp 'No resources for Whelk, you should define some in config'
 		unless keys %resources;
 
@@ -86,14 +95,14 @@ sub _initialize_resources
 			base_route => $config->{path},
 			wrapper => $self
 				->_load_package(
-					$config->{wrapper} // $args{wrapper},
+					$config->{wrapper} // $args->{wrapper},
 					'Whelk::Wrapper',
 				)
 				->new,
 
 			formatter => $self
 				->_load_package(
-					$config->{formatter} // $args{formatter},
+					$config->{formatter} // $args->{formatter},
 					'Whelk::Formatter',
 				)
 				->new(app => $self->app),
@@ -111,10 +120,11 @@ sub _initialize_resources
 
 sub _install_openapi
 {
-	my ($self, %args) = @_;
+	my ($self) = @_;
 	my $app = $self->app;
+	my $args = $self->config;
 
-	my $config = $args{openapi};
+	my $config = $args->{openapi};
 	return unless $config;
 
 	croak 'openapi requires path'
@@ -123,7 +133,7 @@ sub _install_openapi
 	my $openapi_class = $self->_load_package($config->{class} // 'Whelk::OpenAPI');
 	$self->openapi_generator($openapi_class->new);
 
-	my $formatter_class = $self->_load_package($config->{formatter} // $args{formatter}, 'Whelk::Formatter');
+	my $formatter_class = $self->_load_package($config->{formatter} // $args->{formatter}, 'Whelk::Formatter');
 	my $formatter = $formatter_class->new(app => $self->app);
 
 	$self->openapi_generator->parse(

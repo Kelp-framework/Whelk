@@ -6,6 +6,13 @@ attr 'config_module' => '+Whelk::Config';
 
 sub before_dispatch { }
 
+sub build
+{
+	my ($self) = @_;
+
+	$self->whelk->init;
+}
+
 1;
 
 __END__
