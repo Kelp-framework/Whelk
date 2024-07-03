@@ -19,7 +19,7 @@ sub openapi_dump
 
 	my @required;
 	my %items;
-	my $properties = $self->properties;
+	my $properties = $self->properties // {};
 	foreach my $key (sort keys %{$properties}) {
 		$items{$key} = $properties->{$key}->openapi_schema($openapi_obj);
 		push @required, $key

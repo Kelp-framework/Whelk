@@ -11,7 +11,7 @@ sub openapi_dump
 
 	my $res = {
 		type => 'array',
-		items => $self->items->openapi_schema($openapi_obj),
+		($self->items ? (items => $self->items->openapi_schema($openapi_obj)) : ()),
 	};
 
 	if (defined $self->description) {
