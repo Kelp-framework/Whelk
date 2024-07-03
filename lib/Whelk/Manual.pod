@@ -123,7 +123,7 @@ L<Kelp::Manual> if you need guidance in that area.
 Whelk is neither an API generator (from an OpenAPI document), nor OpenAPI
 document generator. Instead, it can be thought of as a framework for
 implementing both API code and specification at the same time. OpenAPI is not
-an afterthought in Whelk, but rather welded into it's very core. Each time you
+an afterthought in Whelk, but rather welded into its very core. Each time you
 declare how your data should look, it serve both as documentation through
 OpenAPI as well as runtime validation scheme.
 
@@ -137,7 +137,7 @@ Whelk uses a set of custom entities to deliver its functionality. The most
 basic entity in Whelk is a I<resource>, which is a specialized Kelp controller.
 APIs consist of one or more resources, each extending L<Whelk::Resource> and
 implementing the C<api> method. This method will be automatically run once per
-resource during app's construction and it's job is to define all the
+resource during app's construction and its job is to define all the
 subentities. Resources are represented as a tag in the API's specification.
 
 Instead of defining standard Kelp routes, resources should instead define
@@ -154,7 +154,7 @@ defines one response format, multiple request formats, and some utility
 functions to handle formats on Kelp request and response objects. By default,
 a JSON formatter is used. See L<Whelk::Formatter> for more information.
 
-Lastly, Whelk uses I<wrappers> to define how are requests and responses treated
+Lastly, Whelk uses I<wrappers> to define how requests and responses are treated
 before and after they reach the endpoint's destination. Wrappers are
 interchangeable and extendable to the core, allowing you to introduce custom
 behavior to your resource with little effort. See L<Whelk::Wrapper> for
@@ -188,7 +188,7 @@ the existing files unless you use C<--force> flag.
 
 After setting up the app, you can immediatelly execute C<plackup> and navigate
 to C<localhost:5000/openapi.json> to get an OpenAPI document describing the
-generated resource. Tools like C<Swagger Editor|https://editor.swagger.io/> can
+generated resource. Tools like L<Swagger Editor|https://editor.swagger.io/> can
 be used to see it in a human-friendly form.
 
 =head3 Configuration
@@ -234,11 +234,11 @@ B<Mandatory>. A base path under which each endpoint in this resource will be mou
 
 =item wrapper
 
-Same as L<wrapper>, but specialized for this resource only.
+Same as L</wrapper>, but specialized for this resource only.
 
 =item formatter
 
-Same as L<formatter>, but specialized for this resource only.
+Same as L</formatter>, but specialized for this resource only.
 
 =item description
 
@@ -260,7 +260,7 @@ B<Mandatory>. A path under which OpenAPI endpoint will be mounted.
 
 =item formatter
 
-Same as L<formatter>, but specialized for OpenAPI endpont only.
+Same as L</formatter>, but specialized for OpenAPI endpont only.
 
 =item class
 

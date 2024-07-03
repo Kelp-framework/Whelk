@@ -38,8 +38,13 @@ inside a L<Kelp> application as a module.
 Whelk is integrated with OpenAPI/Swagger and automatically generates a document
 according to spec v3 rules. All the data for the document is taken directly
 from your endpoint validation rules, which ensures only minimal effort is
-needed to generate a documentation for your project, which can be beautifully
-visualized using OpenAPI tools like Swagger UI.
+needed to generate a documentation for your project. The resulting
+documentation can be beautifully visualized using OpenAPI tools like Swagger
+UI.
+
+Whelk is currently in beta. It's not production ready and some changes in
+interface are possible. Beta phase will end no later than Q3 2024 with version
+C<1.00>.
 
 To get started, take a look at L<Whelk::Manual>.
 

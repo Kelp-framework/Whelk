@@ -69,8 +69,8 @@ Whelk::Manual::Kelp - Setting up Whelk inside Kelp
 
 Whelk is easily set up to work as a regular L<Kelp> module. This document
 explains the differences between standalone Whelk and nested Whelk. Most
-information from L<Whelk::Manual> is still valid, but some extra care must be
-taken.
+information from L<Whelk::Manual> is still valid, but there are a couple of
+differences.
 
 =head2 Configuration: Whelk module and reblessing router
 
