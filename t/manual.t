@@ -1,6 +1,7 @@
 use Kelp::Base -strict;
 use Kelp::Test;
 use Test::More;
+use Test::Deep;
 use HTTP::Request::Common;
 use Whelk;
 
@@ -13,6 +14,17 @@ my $t = Kelp::Test->new(app => $app);
 # This tests whether complex examples from the manual are correct. Needs to be
 # kept up to date when manual changes.
 ################################################################################
+
+$t->request(GET '/pangrams')
+	->code_is(200)
+	->json_cmp(
+		superbagof(
+			{
+				language => 'English',
+				pangram => 'a quick brown fox jumped over a lazy dog',
+			}
+		)
+	);
 
 $t->request(POST '/multiply/3', Content_Type => 'application/json', Content => '{}')
 	->code_is(200)

@@ -91,8 +91,6 @@ Whelk::Manual - Reference to APIs with Whelk
 		];
 	}
 
-	1;
-
 	##################
 	# File: app.psgi #
 	##################

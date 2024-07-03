@@ -3,7 +3,36 @@ package Whelk::Resource::Manual;
 use Kelp::Base 'Whelk::Resource';
 use Whelk::Schema;
 
-sub api
+sub ex_synopsis
+{
+	my ($self) = @_;
+
+	Whelk::Schema->build(
+		language => {
+			type => 'object',
+			properties => {
+				language => {
+					type => 'string',
+				},
+				pangram => {
+					type => 'string',
+				},
+			},
+		}
+	);
+
+	$self->add_endpoint(
+		[GET => '/pangrams'] => 'action_list',
+		description => 'Returns a list of language names with a pangram in each language',
+		response => {
+			type => 'array',
+			description => 'List of languages',
+			items => \'language',
+		}
+	);
+}
+
+sub ex_params
 {
 	my ($self) = @_;
 
@@ -64,6 +93,35 @@ sub api
 			}
 		}
 	);
+}
+
+sub api
+{
+	my ($self) = @_;
+
+	# SYNOPSIS
+	$self->ex_synopsis;
+
+	# PARAMS EXAMPLE
+	$self->ex_params;
+}
+
+sub action_list
+{
+	return [
+		{
+			language => 'English',
+			pangram => 'a quick brown fox jumped over a lazy dog',
+		},
+		{
+			language => 'Francais',
+			pangram => 'voix ambiguë d’un cœur qui au zéphyr préfère les jattes de kiwis',
+		},
+		{
+			language => 'Polski',
+			pangram => 'mężny bądź, chroń pułk twój i sześć flag',
+		},
+	];
 }
 
 1;
