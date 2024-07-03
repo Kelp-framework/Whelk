@@ -1,0 +1,16 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Whelk::Manual::Kelp - Setting up Whelk inside Kelp
+
+=head1 SYNOPSIS
+
+	TODO
+
+=head1 DESCRIPTION
+
+TODO
+
