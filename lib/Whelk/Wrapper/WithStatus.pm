@@ -27,7 +27,7 @@ sub wrap_success
 sub build_response_schemas
 {
 	my ($self, $endpoint) = @_;
-	my $schema = $endpoint->response_schema;
+	my $schema = $endpoint->response;
 	my $schemas = $endpoint->response_schemas;
 
 	if ($schema && $schema->empty) {

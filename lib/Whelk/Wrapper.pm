@@ -64,8 +64,8 @@ sub inhale_request
 		);
 	}
 
-	if ($endpoint->request_schema) {
-		$app->stash->{request} = $endpoint->request_schema->inhale_exhale(
+	if ($endpoint->request) {
+		$app->stash->{request} = $endpoint->request->inhale_exhale(
 			$endpoint->formatter->get_request_body($app),
 			sub {
 				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");

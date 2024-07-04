@@ -61,7 +61,7 @@ sub _build_path
 	}
 
 	# build requests
-	if (my $schema = $endpoint->request_schema) {
+	if (my $schema = $endpoint->request) {
 		foreach my $format (values %{$endpoint->formatter->supported_formats}) {
 			$requests{content}{$format}{schema} = $schema->openapi_schema($self);
 		}

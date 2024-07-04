@@ -2,6 +2,9 @@ use Kelp::Base -strict;
 use Test::More;
 use Test::Exception;
 use Whelk::Schema;
+use Whelk;
+
+use lib 't/lib';
 
 ################################################################################
 # This tests whether the base for some whelk packages is strict
@@ -37,6 +40,12 @@ subtest 'schemas are strict' => sub {
 			},
 		);
 	};
+};
+
+subtest 'endpoints are strict' => sub {
+	throws_ok {
+		my $app = Whelk->new(mode => 'typo');
+	} qr{attribute respnose is not valid};
 };
 
 done_testing;
