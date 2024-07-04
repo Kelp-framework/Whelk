@@ -4,6 +4,7 @@ Revision history for Whelk
 	- Framework now detects typos made in configuration of schemas and endpoints
 	- Renamed request_schema to request and response_schema to response in Endpoint
 	- Removed example libraries from the index
+	- Documentation fixes
 
 0.02 - 2024-07-03
 	- Added a TodoApp example
