@@ -8,7 +8,7 @@ sub api
 	my ($self) = @_;
 
 	$self->add_endpoint(
-		'/' => sub {},
+		'/' => sub { },
 		respnose => {
 			type => 'array',
 		}

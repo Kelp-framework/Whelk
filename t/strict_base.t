@@ -15,7 +15,7 @@ subtest 'schemas are strict' => sub {
 		Whelk::Schema->build(
 			test_int => {
 				type => 'integer',
-				minimum => 5, # not supported yet
+				minimum => 5,    # not supported yet
 			},
 		);
 	} qr{attribute minimum is not valid};
