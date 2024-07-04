@@ -1,6 +1,8 @@
 Revision history for Whelk
 
 {{$NEXT}}
+
+0.03 - 2024-07-04
 	- Framework now detects typos made in configuration of schemas and endpoints
 	- Renamed request_schema to request and response_schema to response in Endpoint
 	- Removed example libraries from the index
