@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Integer;
 
-use Kelp::Base 'Whelk::Schema::Definition::Number';
+use Whelk::StrictBase 'Whelk::Schema::Definition::Number';
 
 sub openapi_dump
 {

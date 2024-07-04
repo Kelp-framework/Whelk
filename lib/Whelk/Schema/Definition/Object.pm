@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Object;
 
-use Kelp::Base 'Whelk::Schema::Definition';
+use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr properties => undef;
 attr strict => !!0;

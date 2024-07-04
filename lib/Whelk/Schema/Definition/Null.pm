@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Null;
 
-use Kelp::Base 'Whelk::Schema::Definition';
+use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 sub openapi_dump
 {

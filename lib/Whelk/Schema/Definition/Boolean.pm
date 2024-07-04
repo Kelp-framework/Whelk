@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Boolean;
 
-use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
+use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
 use List::Util qw(none);
 

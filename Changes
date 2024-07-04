@@ -1,6 +1,7 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- Framework now detects typos made in schemas
 	- Removed example libraries from the index
 
 0.02 - 2024-07-03
