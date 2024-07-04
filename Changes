@@ -1,6 +1,8 @@
 Revision history for Whelk
 
-0.02 - 2023-07-03
+{{$NEXT}}
+	- Removed example libraries from the index
+
 0.02 - 2024-07-03
 	- Added a TodoApp example
 	- Now uses persistent_controllers from Kelp 2.15
