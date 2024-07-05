@@ -1,6 +1,7 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- Set minimum YAML::PP version
 
 0.03 - 2024-07-04
 	- Framework now detects typos made in configuration of schemas and endpoints
