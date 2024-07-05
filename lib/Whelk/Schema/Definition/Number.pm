@@ -16,11 +16,11 @@ sub openapi_dump
 	}
 
 	if ($self->has_default) {
-		$res->{default} = $self->exhale;
+		$res->{default} = $self->inhale_exhale;
 	}
 
 	if (defined $self->example) {
-		$res->{example} = $self->example;
+		$res->{example} = $self->inhale_exhale($self->example);
 	}
 
 	return $res;
