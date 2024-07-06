@@ -296,7 +296,7 @@ Whelk::Wrapper - Base class for wrappers
 
 =head1 DESCRIPTION
 
-Whelk::Wrapper is a base class for wrappers. Wrappers job is to wrap the
+Whelk::Wrapper is a base class for wrappers. Wrapper's job is to wrap the
 endpoint handler in necessary logic: validating request and response data,
 adding extra data to responses and error handling. Wrappers do not handle
 encoding requests and responses (for example with C<JSON>), that's a job for
