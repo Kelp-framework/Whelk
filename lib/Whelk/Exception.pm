@@ -26,7 +26,8 @@ Whelk::Exception - Exceptions for your API
 	# no log will be created, but the hint will be returned in the API response
 	Whelk::Exception->throw(403, hint => 'Access denied, not authorized');
 
-	# fatal API error, will not return an API error page but rather regular text / html error page
+	# fatal API error, will not return an API error page but rather regular
+	# text / html error page
 	Kelp::Exception->throw(500, body => 'Something went very, very wrong');
 
 =head1 DESCRIPTION

@@ -1,6 +1,7 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- Added documentation for Whelk::Wrapper
 
 0.04 - 2024-07-06
 	- Default and example values are now validated before they are put into OpenAPI document
