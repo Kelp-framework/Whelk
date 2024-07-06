@@ -65,7 +65,7 @@ sub inhale_request
 	}
 
 	if ($endpoint->request) {
-		$app->stash->{request} = $endpoint->request->inhale_exhale(
+		$req->stash->{request} = $endpoint->request->inhale_exhale(
 			$endpoint->formatter->get_request_body($app),
 			sub {
 				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");
@@ -137,7 +137,7 @@ sub execute
 	my ($success, $data);
 	try {
 		$self->inhale_request($app, $endpoint);
-		$data = $endpoint->code->($app, @args);
+		$data = $endpoint->code->($app->context->current, @args);
 		$success = 1;
 	}
 	catch {
@@ -215,7 +215,7 @@ sub wrap
 	$self->build_response_schemas($endpoint);
 
 	return sub {
-		my $app = shift;
+		my $app = shift->context->app;
 
 		my $prepared = $self->prepare_response(
 			$app,
@@ -367,7 +367,7 @@ is to correctly be mapped to C<204 No Body> HTTP status.
 This is a helper method which validates the request. It may be overridden for
 extra behavior.
 
-To ensure C<get_request_body> method works, it must set C<<
+To ensure C<request_body> method works, it must set C<<
 $app->req->stash->{request} >> after validating and cleaning the request body.
 
 =head2 execute

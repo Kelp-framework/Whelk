@@ -9,13 +9,13 @@ use Whelk::Endpoint;
 use Whelk::Endpoint::Parameters;
 use Whelk::Schema;
 
-requires 'api';
+requires qw(api context);
 
 sub _whelk_config
 {
 	my ($self, $key) = @_;
 
-	return $self->whelk->resources->{ref $self}{$key};
+	return $self->context->app->whelk->resources->{ref $self}{$key};
 }
 
 sub _whelk_adjust_pattern
@@ -38,7 +38,7 @@ sub _whelk_adjust_to
 {
 	my ($self, $to) = @_;
 
-	my $base = $self->routes->base;
+	my $base = $self->context->app->routes->base;
 	my $class = ref $self;
 	if ($class !~ s/^${base}:://) {
 		$class = "+$class";
@@ -57,7 +57,7 @@ sub request_body
 	my ($self) = @_;
 
 	# this is set by wrapper when there is request body validation
-	return $self->stash->{request};
+	return $self->context->req->stash->{request};
 }
 
 sub add_endpoint
@@ -82,7 +82,7 @@ sub add_endpoint
 	$pattern = $self->_whelk_adjust_pattern($pattern);
 	$args->{to} = $self->_whelk_adjust_to($args->{to});
 	$args->{method} //= 'GET';
-	my $route = $self->add_route($pattern, $args)->parent;
+	my $route = $self->context->app->add_route($pattern, $args)->parent;
 
 	my $endpoint = Whelk::Endpoint->new(
 		%meta,
@@ -94,7 +94,7 @@ sub add_endpoint
 
 	$endpoint->wrap($self);
 
-	push @{$self->whelk->endpoints}, $endpoint;
+	push @{$self->context->app->whelk->endpoints}, $endpoint;
 	return $self;
 }
 
