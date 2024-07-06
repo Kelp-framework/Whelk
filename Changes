@@ -1,11 +1,12 @@
 Revision history for Whelk
 
 {{$NEXT}}
-	- Framework no longer assumes that controller is a subclass of Kelp, allowing custom base controllers
+	- Framework no longer assumes resource is a subclass of Kelp, allowing custom base controllers
 	- Added documentation for Whelk::Wrapper
 	- Added documentation for Whelk::Formatter
 	- Added documentation for Whelk::Role::Resource
 	- Added documentation for Whelk::Resource
+	- Set minimum List::Util version
 
 0.04 - 2024-07-06
 	- Default and example values are now validated before they are put into OpenAPI document
