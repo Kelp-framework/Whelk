@@ -3,6 +3,7 @@ package Whelk::Endpoint;
 use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;
+use Whelk::Endpoint::Parameters;
 
 attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
 attr -summary => undef;

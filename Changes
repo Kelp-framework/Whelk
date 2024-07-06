@@ -4,6 +4,7 @@ Revision history for Whelk
 	- Framework no longer assumes that controller is a subclass of Kelp, allowing custom base controllers
 	- Added documentation for Whelk::Wrapper
 	- Added documentation for Whelk::Formatter
+	- Added documentation for Whelk::Role::Resource
 
 0.04 - 2024-07-06
 	- Default and example values are now validated before they are put into OpenAPI document

@@ -4,10 +4,7 @@ use Kelp::Base -attr;
 use Role::Tiny;
 
 use Carp;
-
 use Whelk::Endpoint;
-use Whelk::Endpoint::Parameters;
-use Whelk::Schema;
 
 requires qw(api context);
 
@@ -99,4 +96,62 @@ sub add_endpoint
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Whelk::Role::Resource - Role for Whelk API resources
+
+=head1 SYNOPSIS
+
+	package My::Resource;
+
+	use Kelp::Base 'My::Controller';
+	use Role::Tiny::With;
+
+	with qw(WhelK::Role::Resource);
+
+	# required by the role
+	sub api
+	{
+		my ($self) = @_;
+
+		# implement the api
+		...;
+	}
+
+=head1 DESCRIPTION
+
+This is a role which implements Whelk resources. It must be applied to a Kelp
+controller which is meant to be used as a resource for Whelk.
+L<Whelk::Resource> is such controller, and is also a base controller for
+L<Whelk>. If you write your own Kelp application which uses Whelk, you most
+certainly want to only apply it in a couple of your controllers and not the
+main controller.
+
+This role requires you to implement C<api> method - it will not apply if this
+prerequisite is not met. It also requires C<context> attribute to be present,
+which is also a requirement made by Kelp.
+
+Whelk will reject any resources defined in its C<resources> configuration field
+which do not consume this role.
+
+=head1 METHODS
+
+This role implements just a couple of helpful methods which you may use in
+C<api> method and your route handler methods.
+
+=head2 request_body
+
+	my $body = $self->request_body;
+
+A helper which returns the request body saved by the wrapper in stash key C<request>.
+
+=head2 add_endpoint
+
+Standard Whelk method to add endpoints, discussed at length in
+L<Whelk::Manual/Adding endpoints>.
 
