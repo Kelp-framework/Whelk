@@ -30,6 +30,13 @@ Whelk - A friendly API framework based on Kelp
 
 =head1 DESCRIPTION
 
+=begin html
+
+<p style="text-align: center"><img width="80%" src="https://raw.githubusercontent.com/Kelp-framework/Art/master/whelk/logo_wide.png" alt="logo"></p>
+<p style="text-align: center"><b>A friendly web API framework</b></p>
+
+=end html
+
 Whelk is an API framework which helps you create correct, fast,
 self-documenting APIs. It's easy to learn, fun to work with and extremely
 customizable. It can be run either standalone as a L<Plack> application, or
