@@ -107,9 +107,9 @@ Whelk::Role::Resource - Role for Whelk API resources
 
 =head1 SYNOPSIS
 
-	package My::Resource;
+	package My::Custom::Resource;
 
-	use Kelp::Base 'My::Controller';
+	use Kelp::Base 'My::Custom::Controller';
 	use Role::Tiny::With;
 
 	with qw(WhelK::Role::Resource);
@@ -128,9 +128,10 @@ Whelk::Role::Resource - Role for Whelk API resources
 This is a role which implements Whelk resources. It must be applied to a Kelp
 controller which is meant to be used as a resource for Whelk.
 L<Whelk::Resource> is such controller, and is also a base controller for
-L<Whelk>. If you write your own Kelp application which uses Whelk, you most
-certainly want to only apply it in a couple of your controllers and not the
-main controller.
+L<Whelk> - there is no need to manually consume the role if you are extending
+it. If you write your own Kelp application which uses Whelk, you most certainly
+want to only apply it in a couple of your controllers and not the main
+controller.
 
 This role requires you to implement C<api> method - it will not apply if this
 prerequisite is not met. It also requires C<context> attribute to be present,

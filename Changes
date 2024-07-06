@@ -5,6 +5,7 @@ Revision history for Whelk
 	- Added documentation for Whelk::Wrapper
 	- Added documentation for Whelk::Formatter
 	- Added documentation for Whelk::Role::Resource
+	- Added documentation for Whelk::Resource
 
 0.04 - 2024-07-06
 	- Default and example values are now validated before they are put into OpenAPI document
