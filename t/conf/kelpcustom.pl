@@ -10,6 +10,7 @@
 			resources => {
 				'Test' => '/',
 			},
+			openapi => '/openapi.json',
 		},
 	}
 }

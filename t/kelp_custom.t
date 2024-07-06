@@ -18,5 +18,9 @@ $t->request(GET '/test')
 	->code_is(200)
 	->json_cmp([qw(three two one)]);
 
+$t->request(GET '/openapi.json')
+	->code_is(200)
+	->content_type_is('application/json');
+
 done_testing;
 
