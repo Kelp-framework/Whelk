@@ -3,6 +3,7 @@ Revision history for Whelk
 {{$NEXT}}
 	- Default and example values are now validated before they are put into OpenAPI document
 	- Typo detection now suggests a closest valid alternative if one exists
+	- Refactored Whelk::OpenAPI
 	- Set minimum YAML::PP version
 
 0.03 - 2024-07-04
