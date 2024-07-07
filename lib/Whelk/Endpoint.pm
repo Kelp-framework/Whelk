@@ -10,8 +10,9 @@ attr -summary => undef;
 attr -description => undef;
 attr -resource => sub { croak 'resource is required in endpoint' };
 attr -route => sub { croak 'route is required in endpoint' };
-attr -code => sub { croak 'code is required in endpoint' };
 attr -formatter => sub { croak 'formatter is required in endpoint' };
+attr -wrapper => sub { croak 'wrapper is required in endpoint' };
+attr code => undef;
 attr path => undef;
 attr request => undef;
 attr response => undef;
@@ -41,6 +42,10 @@ sub new
 	$self->parameters->header_schema;
 	$self->parameters->cookie_schema;
 
+	# wrap the endpoint sub
+	$self->code($self->route->dest->[1]);
+	$self->route->dest->[1] = $self->wrapper->wrap($self);
+
 	return $self;
 }
 
@@ -69,14 +74,6 @@ sub _build_path
 	$path =~ s/\0//g;
 
 	return $path;
-}
-
-sub wrap
-{
-	my ($self, $controller) = @_;
-
-	$self->route->dest->[0] //= ref $controller;    # make sure plain subs work
-	$self->route->dest->[1] = $controller->_whelk_config('wrapper')->wrap($self);
 }
 
 1;

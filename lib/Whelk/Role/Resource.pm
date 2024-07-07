@@ -80,16 +80,15 @@ sub add_endpoint
 	$args->{to} = $self->_whelk_adjust_to($args->{to});
 	$args->{method} //= 'GET';
 	my $route = $self->context->app->add_route($pattern, $args)->parent;
+	$route->dest->[0] //= ref $self;    # makes sure plain subs work
 
 	my $endpoint = Whelk::Endpoint->new(
 		%meta,
 		resource => $self->_whelk_config('resource'),
 		formatter => $self->_whelk_config('formatter'),
+		wrapper => $self->_whelk_config('wrapper'),
 		route => $route,
-		code => $route->dest->[1],
 	);
-
-	$endpoint->wrap($self);
 
 	push @{$self->context->app->whelk->endpoints}, $endpoint;
 	return $self;
