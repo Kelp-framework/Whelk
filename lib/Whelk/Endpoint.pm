@@ -5,18 +5,18 @@ use Carp;
 use Whelk::Schema;
 use Whelk::Endpoint::Parameters;
 
-attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
-attr -summary => undef;
-attr -description => undef;
+attr '?-id' => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
+attr '?-summary' => undef;
+attr '?-description' => undef;
 attr -resource => sub { croak 'resource is required in endpoint' };
 attr -route => sub { croak 'route is required in endpoint' };
 attr -formatter => sub { croak 'formatter is required in endpoint' };
 attr -wrapper => sub { croak 'wrapper is required in endpoint' };
 attr code => undef;
 attr path => undef;
-attr request => undef;
-attr response => undef;
-attr parameters => undef;
+attr '?request' => undef;
+attr '?response' => undef;
+attr '?parameters' => undef;
 
 # to be built in wrapers
 attr -response_schemas => sub { {} };

@@ -2,9 +2,9 @@ package Whelk::Schema::Definition::_Scalar;
 
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
-attr required => sub { !defined $_[0]->default };
-attr default => undef;
-attr example => undef;
+attr '?required' => sub { !defined $_[0]->default };
+attr '?default' => undef;
+attr '?example' => undef;
 
 sub has_default
 {

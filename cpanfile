@@ -8,6 +8,9 @@ requires 'YAML::PP' => '0.034';
 # needed for uniq on old perls
 requires 'List::Util' => '1.44';
 
+# needed for typo suggestions
+requires 'Text::Levenshtein' => 0;
+
 on 'test' => sub {
 	requires 'Test::Exception' => 0;
 };

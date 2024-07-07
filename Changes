@@ -3,6 +3,7 @@ Revision history for Whelk
 {{$NEXT}}
 	- Added documentation for Whelk::Schema::Definition
 	- Added documentation for Whelk::OpenAPI
+	- Added Text::Levenshtein dependency and improved suggestions for unknown keys
 
 0.05 - 2024-07-06
 	- Framework no longer assumes resource is a subclass of Kelp, allowing custom base controllers

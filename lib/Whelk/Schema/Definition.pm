@@ -12,8 +12,8 @@ use JSON::PP;
 require Whelk::Schema;
 
 attr name => undef;
-attr required => !!1;
-attr description => undef;
+attr '?required' => !!1;
+attr '?description' => undef;
 
 sub create
 {
