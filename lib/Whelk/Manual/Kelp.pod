@@ -68,7 +68,7 @@ differences.
 
 =head2 Configuration: Whelk module and reblessing router
 
-C<Kelp::Module::Whelk> is a module which must be loaded in app's configuration.
+L<Kelp::Module::Whelk> is a module which must be loaded in app's configuration.
 It can be loaded at any place, since it does not fully init itself during
 initial module load.
 
@@ -104,4 +104,6 @@ controllers as Whelk resources.
 =head1 SEE ALSO
 
 L<Whelk::Manual>
+
+L<Kelp::Module::Whelk>
 
