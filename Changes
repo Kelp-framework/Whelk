@@ -1,6 +1,8 @@
 Revision history for Whelk
 
 {{$NEXT}}
+
+0.06 - 2024-07-07
 	- Fixed typos not being detected for endpoint parameters
 	- Added Text::Levenshtein dependency and improved suggestions for unknown keys
 	- Added documentation for Whelk::Schema::Definition
