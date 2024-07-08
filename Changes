@@ -1,6 +1,7 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- OpenAPI endpoint will not be installed if path is not passed
 
 0.06 - 2024-07-07
 	- Fixed typos not being detected for endpoint parameters
