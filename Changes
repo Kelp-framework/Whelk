@@ -1,7 +1,10 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- Stable version
 	- OpenAPI endpoint will not be installed if path is not passed
+	- Added extra field rules
+	- Smoker fixes
 
 0.06 - 2024-07-07
 	- Fixed typos not being detected for endpoint parameters
