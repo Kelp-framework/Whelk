@@ -93,7 +93,7 @@ sub inhale
 				return "object[$key]->$inhaled" if defined $inhaled;
 			}
 
-			if ($self->strict && keys %$value > keys %$properties) {
+			if ($self->strict) {
 				foreach my $key (keys %$value) {
 					next if exists $properties->{$key};
 					return "object[$key]->redundant";

@@ -165,7 +165,11 @@ subtest 'should inhale typed object' => sub {
 					properties => {
 						nested => {
 							type => 'null',
-						}
+						},
+						nested2 => {
+							type => 'null',
+							required => !!0,
+						},
 					},
 					required => !!0,
 					strict => !!1,
