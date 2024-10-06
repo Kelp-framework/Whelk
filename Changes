@@ -2,6 +2,7 @@ Revision history for Whelk
 
 {{$NEXT}}
 	- Fixed object strictness check
+	- Fixed using partial schemas defined in a hash
 	- Improved error locations reported by the module
 
 1.00 - 2024-09-08

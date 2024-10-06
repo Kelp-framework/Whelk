@@ -66,14 +66,15 @@ sub _build
 		return $ret;
 	}
 	elsif (ref $item eq 'HASH') {
-		my $type = delete $item->{type};
+		my %data = %{$item};
+		my $type = delete $data{type};
 		croak 'no schema definition type specified'
 			unless defined $type;
 
 		my $class = __PACKAGE__;
 		$type = ucfirst $type;
 
-		return Kelp::Util::load_package("${class}::${type}")->new(%$item);
+		return Kelp::Util::load_package("${class}::${type}")->new(%data);
 	}
 	else {
 		croak 'can only build a definition from SCALAR, ARRAY or HASH';

@@ -165,6 +165,38 @@ extended schema. C<type> cannot be replaced.
 Schema declared this way will be put into the OpenAPI document as-is, without
 referencing any other schema.
 
+=head3 Reusable schemas without OpenAPI trace
+
+All methods above will leave a trace in your OpenAPI output, which may not be
+what you want. If you for example just want to use a list of properties across
+a couple of objects, you may want to use a regular hash instead:
+
+	my %common_fields = (
+		name => {
+			type => 'string',
+		},
+		age => {
+			type => 'integer',
+		},
+	);
+
+	Whelk::Schema->build(
+		person => {
+			type => 'object,
+			properties => {
+				%common_fields,
+				id => {
+					type => 'integer',
+				},
+			},
+		}
+	);
+
+This should work well as presented, but since Whelk does not usually deep-clone
+its input before using it, some nested parts of C<%common_fields> may get
+changed or blessed. Don't rely on its contents being exactly as you defined it,
+or deep-clone it yourself before passing it to Whelk.
+
 =head2 Available types
 
 Each new schema must have a C<type> defined. All types share these common configuration values:
