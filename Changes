@@ -1,6 +1,8 @@
 Revision history for Whelk
 
 {{$NEXT}}
+
+1.01 - 2024-10-06
 	- Added nullable attribute to schemas
 	- Fixed object strictness check
 	- Fixed using partial schemas defined in a hash
