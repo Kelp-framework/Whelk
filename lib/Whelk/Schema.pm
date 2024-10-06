@@ -187,6 +187,7 @@ a couple of objects, you may want to use a regular hash instead:
 				%common_fields,
 				id => {
 					type => 'integer',
+					nullable => !!1,
 				},
 			},
 		}
@@ -206,6 +207,10 @@ Each new schema must have a C<type> defined. All types share these common config
 =item * required
 
 Boolean - whether the value is required to be present. C<true> by default.
+
+=item * nullable
+
+Boolean - whether the value can be null (but present). C<false> by default.
 
 =item * description
 
@@ -243,6 +248,9 @@ Extra configuration fields:
 =item * default
 
 A default value to be used when there is no value. Also assumes C<< required => !!0 >>.
+
+CAUTION: Whelk does not differentiate null value and no value. If you specify
+default, a received null value will get replaced with that default.
 
 =item * example
 

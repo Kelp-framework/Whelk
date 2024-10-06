@@ -17,6 +17,7 @@ our @CARP_NOT = qw(Whelk::Schema);
 
 attr name => undef;
 attr '?required' => !!1;
+attr '?nullable' => !!0;
 attr '?description' => undef;
 attr '?rules' => sub { [] };
 
@@ -81,6 +82,12 @@ sub _build
 	}
 }
 
+sub _valid_nullable
+{
+	# this will get executed a lot, so skip unpacking @_
+	return !defined $_[1] && $_[0]->nullable;
+}
+
 sub _inhale_extra_rules
 {
 	my ($self, $value) = @_;
@@ -100,6 +107,10 @@ sub _openapi_dump_extra_rules
 	my %result;
 	foreach my $rule (@{$self->rules}) {
 		%result = (%result, %{$rule->openapi});
+	}
+
+	if ($self->nullable) {
+		$result{nullable} = JSON::PP::true;
 	}
 
 	return \%result;
@@ -243,6 +254,10 @@ creating a named schema in L<Whelk::Schema/build>.
 
 Whether this definition is required. It's needed for cases where it is nested
 inside an object or inside C<parameters> for an endpoint.
+
+=head2 nullable
+
+Whether this definiton can be C<null> regardless of type. False by default.
 
 =head2 description
 

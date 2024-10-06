@@ -1,6 +1,7 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- Added nullable attribute to schemas
 	- Fixed object strictness check
 	- Fixed using partial schemas defined in a hash
 	- Improved error locations reported by the module

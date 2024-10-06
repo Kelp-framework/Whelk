@@ -78,6 +78,8 @@ sub inhale
 {
 	my ($self, $value) = @_;
 
+	return undef if $self->_valid_nullable($value);
+
 	if (ref $value eq 'HASH') {
 		my $properties = $self->properties;
 		if ($properties) {
@@ -110,6 +112,8 @@ sub inhale
 sub exhale
 {
 	my ($self, $value) = @_;
+
+	return undef if $self->_valid_nullable($value);
 
 	my $properties = $self->properties;
 	return $value unless $properties;

@@ -66,6 +66,21 @@ subtest 'should inhale integer' => sub {
 		}
 	);
 
+	is $schema->inhale(undef), 'defined', 'inhaled undef ok';
+	is $schema->inhale('abc'), 'number', 'inhaled abc string ok';
+	is $schema->inhale(5), undef, 'inhaled 5 ok';
+	is $schema->inhale(5.5), 'integer', 'inhaled 5.5 ok';
+};
+
+subtest 'should inhale nullable integer' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'integer',
+			nullable => !!1,
+		}
+	);
+
+	is $schema->inhale(undef), undef, 'inhaled undef ok';
 	is $schema->inhale('abc'), 'number', 'inhaled abc string ok';
 	is $schema->inhale(5), undef, 'inhaled 5 ok';
 	is $schema->inhale(5.5), 'integer', 'inhaled 5.5 ok';
@@ -134,6 +149,19 @@ subtest 'should inhale lax array' => sub {
 	is $schema->inhale([]), undef, 'inhaled empty array ok';
 	is $schema->inhale([1]), undef, 'inhaled int in array ok';
 	is $schema->inhale([1, 2]), undef, 'inhaled two ints in array ok';
+};
+
+subtest 'should inhale nullable array' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'array',
+			nullable => 1,
+		}
+	);
+
+	is $schema->inhale(undef), undef, 'inhaled undef ok';
+	is $schema->inhale('no array'), 'array', 'inhaled string ok';
+	is $schema->inhale([]), undef, 'inhaled empty array ok';
 };
 
 subtest 'should inhale object' => sub {

@@ -34,6 +34,8 @@ sub inhale
 {
 	my ($self, $value) = @_;
 
+	return undef if $self->_valid_nullable($value);
+
 	if (ref $value eq 'ARRAY') {
 		my $type = $self->items;
 		if ($type) {
@@ -61,6 +63,8 @@ sub inhale
 sub exhale
 {
 	my ($self, $value) = @_;
+
+	return undef if $self->_valid_nullable($value);
 
 	if (ref $value ne 'ARRAY' && $self->lax) {
 		$value = [$value];
