@@ -4,6 +4,8 @@ use Kelp::Base -strict;
 use Whelk::Schema::Definition;
 use Carp;
 
+our @CARP_NOT = qw(Whelk::Endpoint);
+
 my %registered;
 
 sub build_if_defined

@@ -5,6 +5,8 @@ use Carp;
 use Whelk::Schema;
 use Whelk::Endpoint::Parameters;
 
+our @CARP_NOT = qw(Whelk::Role::Resource);
+
 attr '?-id' => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
 attr '?-summary' => undef;
 attr '?-description' => undef;

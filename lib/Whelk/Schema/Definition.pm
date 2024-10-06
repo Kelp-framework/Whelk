@@ -13,6 +13,8 @@ use Whelk::Schema::ExtraRule;
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
 
+our @CARP_NOT = qw(Whelk::Schema);
+
 attr name => undef;
 attr '?required' => !!1;
 attr '?description' => undef;

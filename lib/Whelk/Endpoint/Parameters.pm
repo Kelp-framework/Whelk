@@ -5,6 +5,8 @@ use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;
 
+our @CARP_NOT = qw(Whelk::Endpoint);
+
 attr '?-path' => sub { {} };
 attr '?-query' => sub { {} };
 attr '?-header' => sub { {} };
