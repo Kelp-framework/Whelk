@@ -2,16 +2,14 @@ package Whelk::Schema::Definition::_Scalar;
 
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
-use constant NO_DEFAULT => \undef;
-
 attr '?required' => sub { !$_[0]->has_default };
-attr '?default' => sub { NO_DEFAULT };
+attr '?default' => sub { Whelk::Schema::NO_DEFAULT };
 attr '?example' => undef;
 
 sub has_default
 {
 	my $default = $_[0]->default;
-	return !ref $default || $default != NO_DEFAULT;
+	return !ref $default || $default != Whelk::Schema::NO_DEFAULT;
 }
 
 sub _inhale

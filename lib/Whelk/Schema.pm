@@ -8,6 +8,8 @@ our @CARP_NOT = qw(Whelk::Endpoint);
 
 my %registered;
 
+use constant NO_DEFAULT => \undef;
+
 sub build_if_defined
 {
 	my ($class, $args) = @_;
@@ -250,7 +252,8 @@ Extra configuration fields:
 A default value to be used when there is no value. Also assumes C<< required => !!0 >>.
 
 CAUTION: Whelk does not differentiate null value and no value. If you specify
-default, a received null value will get replaced with that default.
+default, a received null value will get replaced with that default. To
+explicitly say that there is no default, use C<Whelk::Schema::NO_DEFAULT>.
 
 =item * example
 
