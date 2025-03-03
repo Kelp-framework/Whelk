@@ -23,9 +23,9 @@ sub build_response_schemas
 	my $schema = $endpoint->response;
 	my $schemas = $endpoint->response_schemas;
 
-	$schemas->{200} = $schema;
+	$schemas->{$endpoint->response_code} = $schema;
 
-	$schemas->{500} = $schemas->{400} = Whelk::Schema->get_or_build(
+	$schemas->{'5XX'} = $schemas->{'4XX'} = Whelk::Schema->get_or_build(
 		api_error_simple => {
 			type => 'object',
 			properties => {

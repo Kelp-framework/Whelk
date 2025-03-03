@@ -267,6 +267,11 @@ OpenAPI description of this definition.
 
 An array reference of extra validation rules.
 
+=head2 code
+
+A status code number used in the response. Only used for response schema
+definitions.
+
 =head1 METHODS
 
 =head2 create

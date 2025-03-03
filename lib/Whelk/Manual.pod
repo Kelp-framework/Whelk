@@ -368,9 +368,15 @@ these keys:
 		description => 'Success?',
 	}
 
-A schema definition for the response. Not setting this will not raise an
-exception, but the application won't be able to correctly respond with success
-status.
+A schema definition for the response. Not setting this will cause the action to
+respond with C<204 No Content> (same as C<< type => 'empty' >>).
+
+=item * response_code
+
+	response_code => 201,
+
+A HTTP status success code for the response. If not set, either 200 or 204 will
+be used, depending on C<response>.
 
 =item * parameters
 
