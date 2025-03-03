@@ -21,7 +21,7 @@ sub inhale_request
 		$params->path_schema->inhale_or_error(
 			$req->named,
 			sub {
-				Whelk::Exception->throw(400, hint => "Path parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Path parameters error at: $_[0]");
 			}
 		);
 	}
@@ -30,7 +30,7 @@ sub inhale_request
 		my $new_query = $params->query_schema->inhale_exhale(
 			$req->query_parameters->mixed,
 			sub {
-				Whelk::Exception->throw(400, hint => "Query parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Query parameters error at: $_[0]");
 			}
 		);
 
@@ -50,7 +50,7 @@ sub inhale_request
 		$params->header_schema->inhale_or_error(
 			\%headers,
 			sub {
-				Whelk::Exception->throw(400, hint => "Header parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Header parameters error at: $_[0]");
 			}
 		);
 	}
@@ -59,7 +59,7 @@ sub inhale_request
 		$params->cookie_schema->inhale_or_error(
 			$req->cookies,
 			sub {
-				Whelk::Exception->throw(400, hint => "Cookie parameters error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Cookie parameters error at: $_[0]");
 			}
 		);
 	}
@@ -68,7 +68,7 @@ sub inhale_request
 		$req->stash->{request} = $endpoint->request->inhale_exhale(
 			$endpoint->formatter->get_request_body($app),
 			sub {
-				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");
+				Whelk::Exception->throw(422, hint => "Content error at: $_[0]");
 			}
 		);
 	}
