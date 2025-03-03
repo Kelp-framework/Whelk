@@ -36,7 +36,7 @@ sub _inhale
 
 	if (ref $value) {
 		$inhaled = 'boolean'
-			if none { $value eq $_ } (JSON::PP::true, JSON::PP::false);
+			if none { $value == $_ } (JSON::PP::true, JSON::PP::false);
 	}
 	else {
 		$inhaled = 'boolean'
