@@ -114,6 +114,8 @@ sub _initialize_resources
 				),
 		};
 
+		$controller->schemas
+			if $controller->can('schemas');
 		$controller->api;
 	}
 }
