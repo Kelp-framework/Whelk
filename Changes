@@ -1,6 +1,8 @@
 Revision history for Whelk
 
 {{$NEXT}}
+
+1.02 - 2025-03-04
 	- Added response_code to endpoint definition, which changes success code in generated OpenAPI
 	- Added 'schemas' method to resources as a special method executed before 'api' method is executed
 	- Not setting response in endpoint definition now assumes empty response (status 204)
