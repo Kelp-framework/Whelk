@@ -100,7 +100,7 @@ sub exhale_response
 	if (!$schema) {
 
 		# make sure not to loop if code is already 500
-		die "gave up trying to find a schema for $path"
+		Kelp::Exception->throw(508, body => "gave up trying to find a schema for $path")
 			if $code == 500;
 
 		$app->res->set_code(500);
