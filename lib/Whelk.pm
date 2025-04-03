@@ -21,7 +21,7 @@ __END__
 
 =head1 NAME
 
-Whelk - A friendly API framework based on Kelp
+Whelk - A fortified API framework based on Kelp
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ Whelk - A friendly API framework based on Kelp
 =begin html
 
 <p style="text-align: center"><img width="80%" src="https://raw.githubusercontent.com/Kelp-framework/Art/master/whelk/logo_wide.png" alt="logo"></p>
-<p style="text-align: center"><b>A friendly web API framework</b></p>
+<p style="text-align: center"><b>A fortified web API framework</b></p>
 
 =end html
 
