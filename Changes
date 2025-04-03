@@ -1,6 +1,8 @@
 Revision history for Whelk
 
 {{$NEXT}}
+
+1.03 - 2025-04-03
 	- OpenAPI endpoint will now correctly get the app object from context (in controller environment)
 	- OpenAPI endpoint now has a name 'whelk_openapi' in the router
 
