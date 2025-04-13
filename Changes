@@ -1,6 +1,7 @@
 Revision history for Whelk
 
 {{$NEXT}}
+	- Fix extended scalar values causing an error when building OpenAPI
 	- Improve error reporting for invalid default / example values
 
 1.03 - 2025-04-03

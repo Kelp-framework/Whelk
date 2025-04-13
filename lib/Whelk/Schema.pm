@@ -8,7 +8,7 @@ our @CARP_NOT = qw(Whelk::Endpoint);
 
 my %registered;
 
-use constant NO_DEFAULT => \undef;
+use constant NO_DEFAULT => sub { undef };
 
 sub build_if_defined
 {
