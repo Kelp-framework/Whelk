@@ -13,10 +13,8 @@ sub openapi_dump
 		return $self->_dump_parameters($openapi_obj, %hints);
 	}
 
-	my $res = {
-		%{$self->_openapi_dump_extra_rules},
-		type => 'object',
-	};
+	my $res = $self->SUPER::openapi_dump($openapi_obj, %hints);
+	$res->{type} = 'object';
 
 	my @required;
 	my %items;
@@ -31,10 +29,6 @@ sub openapi_dump
 		$res->{properties} = \%items;
 		$res->{required} = \@required
 			if @required;
-	}
-
-	if (defined $self->description) {
-		$res->{description} = $self->description;
 	}
 
 	return $res;

@@ -6,13 +6,8 @@ sub openapi_dump
 {
 	my ($self, $openapi_obj, %hints) = @_;
 
-	my $res = {
-		type => 'null',
-	};
-
-	if (defined $self->description) {
-		$res->{description} = $self->description;
-	}
+	my $res = $self->SUPER::openapi_dump($openapi_obj, %hints);
+	$res->{type} = 'null';
 
 	return $res;
 }

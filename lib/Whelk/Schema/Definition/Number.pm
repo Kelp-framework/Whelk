@@ -7,22 +7,8 @@ sub openapi_dump
 {
 	my ($self, $openapi_obj, %hints) = @_;
 
-	my $res = {
-		%{$self->_openapi_dump_extra_rules},
-		type => 'number',
-	};
-
-	if (defined $self->description) {
-		$res->{description} = $self->description;
-	}
-
-	if ($self->has_default) {
-		$res->{default} = $self->inhale_exhale;
-	}
-
-	if (defined $self->example) {
-		$res->{example} = $self->inhale_exhale($self->example);
-	}
+	my $res = $self->SUPER::openapi_dump($openapi_obj, %hints);
+	$res->{type} = 'number';
 
 	return $res;
 }
