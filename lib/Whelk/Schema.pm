@@ -200,6 +200,19 @@ its input before using it, some nested parts of C<%common_fields> may get
 changed or blessed. Don't rely on its contents being exactly as you defined it,
 or deep-clone it yourself before passing it to Whelk.
 
+=head2 Where to define the schemas?
+
+It is not important where your schemas are defined, as long as they are defined
+before they are used. Whelk provides C<schemas> method as syntax sugar, which
+will be called just once for each controller. That does not mean schemas must
+be defined there, they may as well be called at the package level (during
+package compilation) or anywhere else.
+
+You can use it to your advantage when creating schemas which should be used for
+the entire application, not just for one controller. It can safely be put in a
+separate package, or even in the C<app.psgi> itself (even though it's surely
+not a good place to keep them).
+
 =head2 Available types
 
 Each new schema must have a C<type> defined. All types share these common configuration values:
